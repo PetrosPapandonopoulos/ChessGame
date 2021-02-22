@@ -1,7 +1,6 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-
 namespace Chess{
 
 	class Board;
@@ -9,6 +8,12 @@ namespace Chess{
 	enum class Color {
 		White,
 		Black
+	};
+
+	enum class MoveResponse {
+		Moved,
+		Failed,
+		Ate
 	};
 
 	class Piece {
@@ -19,10 +24,10 @@ namespace Chess{
 		Piece(Color color, int currentCol, int currentRow):
 			color(color), currentCol(currentCol), currentRow(currentRow)
 		{ }
-		virtual bool checkMove() = 0;
 
 	public:
-		virtual bool move(int newCol, int newRow, Board board) = 0;
+		virtual MoveResponse checkMove(int newCol, int newRow, const Board& board) = 0;
+
 		Color getColor() {
 			return color;
 		}

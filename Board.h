@@ -1,6 +1,5 @@
 #ifndef BOARD_H
 #define BOARD_H
-
 #define BOARD_SIZE	8
 
 #include "Piece.h"
@@ -16,7 +15,18 @@ namespace Chess {
 			//todo init all pieces on board
 		}
 
-		bool isEmpty(int row, int col) {
+		bool move(int currentCol, int CurrentRow, int newCol, int newRow) {
+			if (board[currentCol][CurrentRow] != nullptr) {
+
+				if (board[CurrentRow][CurrentRow]->checkMove(newCol, newRow, *this) == Chess::MoveResponse::Ate) {
+					board[newCol][newRow] = nullptr;
+					board[newCol][newRow] = std::move(board[CurrentRow][CurrentRow]);
+					board[currentCol][CurrentRow] = nullptr;
+				}
+			}
+		}
+
+		bool isEmpty(int row, int col) const{
 			return board[row][col] == nullptr;
 		}
 
@@ -24,7 +34,7 @@ namespace Chess {
 			board[col][row] = nullptr;
 		}
 
-		Color getColor(int col, int row) {
+		Color getColor(int col, int row) const{
 			return board[col][row]->getColor();
 		}
 

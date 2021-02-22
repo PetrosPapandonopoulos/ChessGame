@@ -12,7 +12,7 @@ namespace Chess {
 		Pawn(Color color, int currentCol, int currentRow): Piece(color, currentCol, currentRow)
 		{ }
 
-		bool move(int newCol, int newRow, Board board);
+		MoveResponse checkMove(int newCol, int newRow,const Board& board);
 
 	};
 }
