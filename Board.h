@@ -17,8 +17,8 @@ namespace Chess {
 
 		bool move(int currentCol, int CurrentRow, int newCol, int newRow) {
 			if (board[currentCol][CurrentRow] != nullptr) {
-
-				if (board[CurrentRow][CurrentRow]->checkMove(newCol, newRow, *this) == Chess::MoveResponse::Ate) {
+				Chess::MoveResponse result = board[CurrentRow][CurrentRow]->checkMove(newCol, newRow, *this);
+				if (result == Chess::MoveResponse::Ate || result == Chess::MoveResponse::Moved) {
 					board[newCol][newRow] = nullptr;
 					board[newCol][newRow] = std::move(board[CurrentRow][CurrentRow]);
 					board[currentCol][CurrentRow] = nullptr;
@@ -26,22 +26,22 @@ namespace Chess {
 			}
 		}
 
-		bool isEmpty(int row, int col) const{
+		bool isEmpty(int row, int col) const {
 			return board[row][col] == nullptr;
 		}
 
-		void EatPiece( int col, int row) {
+		void EatPiece(int col, int row) {
 			board[col][row] = nullptr;
 		}
 
-		Color getColor(int col, int row) const{
+		Color getColor(int col, int row) const {
 			return board[col][row]->getColor();
 		}
 
 
 
 
-		
+
 
 	};
 }

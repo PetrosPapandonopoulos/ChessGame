@@ -1,7 +1,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-namespace Chess{
+namespace Chess {
 
 	class Board;
 
@@ -21,9 +21,9 @@ namespace Chess{
 		Color color;
 		int currentCol;
 		int currentRow;
-		Piece(Color color, int currentCol, int currentRow):
-			color(color), currentCol(currentCol), currentRow(currentRow)
-		{ }
+		Piece(Color color, int currentCol, int currentRow) :
+			color(color), currentCol(currentCol), currentRow(currentRow) {
+		}
 
 	public:
 		virtual MoveResponse checkMove(int newCol, int newRow, const Board& board) = 0;

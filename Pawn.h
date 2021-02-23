@@ -7,12 +7,12 @@ namespace Chess {
 
 	class Board;
 
-	class Pawn: public Piece {
+	class Pawn : public Piece {
 	public:
-		Pawn(Color color, int currentCol, int currentRow): Piece(color, currentCol, currentRow)
-		{ }
+		Pawn(Color color, int currentCol, int currentRow) : Piece(color, currentCol, currentRow) {
+		}
 
-		MoveResponse checkMove(int newCol, int newRow,const Board& board);
+		MoveResponse checkMove(int newCol, int newRow, const Board& board);
 
 	};
 }

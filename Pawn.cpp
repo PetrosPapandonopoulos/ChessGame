@@ -2,10 +2,10 @@
 #include "Pawn.h"
 
 
-Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow,const Board& board) {
+Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow, const Board& board) {
 
 	//Ate
-	if( (newCol == currentCol + 1 && this->color == Color::Black) ||
+	if ((newCol == currentCol + 1 && this->color == Color::Black) ||
 		(newCol == currentCol - 1 && this->color == Color::White) &&
 		(newRow == currentRow + 1 || newRow == currentRow - 1)) {
 		if (!board.isEmpty(newCol, newRow) && board.getColor(newCol, newRow) != this->color) {
