@@ -1,16 +1,18 @@
 #include "Board.h"
 #include "Rook.h"
 
+// todo: extra valid move for rook named "Castling"
 Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& board) {
 
 	enum  Direction {
 		Up = -1,
 		Down = +1,
 		Forward = +1,
-		Backward = -1
+		Backward = -1,
+		Nothing = 0
 	}; 
 
-	Direction dir;
+	Direction dir = Nothing;
 
 	if (currentCol > newCol) {
 		dir = Up;
@@ -42,6 +44,9 @@ Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& 
 				return Chess::MoveResponse::Failed;
 			}
 		}
+	}
+	else {
+		return Chess::MoveResponse::Failed;
 	}
 
 	//last tile
