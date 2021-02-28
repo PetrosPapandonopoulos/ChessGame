@@ -9,7 +9,7 @@ namespace Chess {
 
 	class Rook: public Piece {
 	public:
-		Rook(Color color, int currentCol, int current): Piece(color, currentCol, currentRow)
+		Rook(Color color, int currentCol, int currentRow, int numOfSprite): Piece(color, currentCol, currentRow, numOfSprite)
 		{ }
 
 		MoveResponse checkMove(int newCol, int newRow, const Board& board);

@@ -38,5 +38,17 @@
     <ClInclude Include="Rook.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Horse.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bishop.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Queen.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="King.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

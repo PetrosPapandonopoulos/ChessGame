@@ -9,7 +9,7 @@ namespace Chess {
 
 	class Pawn : public Piece {
 	public:
-		Pawn(Color color, int currentCol, int currentRow) : Piece(color, currentCol, currentRow) {
+		Pawn(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {
 		}
 
 		MoveResponse checkMove(int newCol, int newRow, const Board& board);
