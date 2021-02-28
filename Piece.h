@@ -1,6 +1,8 @@
 #ifndef PIECE_H
 #define PIECE_H
 
+#include <vector>
+
 namespace Chess {
 
 	class Board;
@@ -24,9 +26,10 @@ namespace Chess {
 		int currentRow;
 		int numOfSprite;
 
-		Piece(Color color, int currentCol, int currentRow, int numOfSprite) :
-			color(color), currentCol(currentCol), currentRow(currentRow), numOfSprite(numOfSprite) {
-		}
+		Piece(Color color, int currentCol, int currentRow, int numOfSprite);
+
+		bool addIfValid(const Board& board, std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int>cordinates);
+
 	public:
 		Color getColor() {
 			return color;
@@ -53,7 +56,8 @@ namespace Chess {
 		}
 
 		virtual MoveResponse checkMove(int newCol, int newRow, const Board& board) = 0;
+
 	};
 }
 
-#endif
+#endif //!PIECE_H

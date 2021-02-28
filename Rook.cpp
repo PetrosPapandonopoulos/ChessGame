@@ -1,61 +1,46 @@
 #include "Board.h"
 #include "Rook.h"
+#include <vector>
 
 // todo: extra valid move for rook named "Castling"
 Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& board) {
 
-	enum  Direction {
-		Up = -1,
-		Down = +1,
-		Forward = +1,
-		Backward = -1,
-		Nothing = 0
-	}; 
+	/* A vector used to store all the possible moves a pawn can make
+	*based on its current cordinates*/
 
-	Direction dir = Nothing;
+	std::vector<std::pair<int, int>> validCordinates;
 
-	if (currentCol > newCol) {
-		dir = Up;
-	}
-	else if (currentCol < newCol) {
-		dir = Down;
-	}
-	else if (currentRow > newRow) {
-		dir = Backward;
-	}
-	else if (currentRow < newRow) {
-		dir = Forward;
-	}
+	//vertical check
+	addSlidingMoves(validCordinates, currentCol + 1, 8, board, true);
+	addSlidingMoves(validCordinates, currentCol - 1, 0, board, true);
+	//horizontal check
+	addSlidingMoves(validCordinates, currentRow + 1, 8, board, false);
+	addSlidingMoves(validCordinates, currentRow - 1, 0, board, false);
 
-	//horizontal
-	if (dir == Up || dir == Down) {
-		for (int i = currentCol; i < newCol + (dir * -1); i++) {
-			int k = currentCol + (i * dir);
-			if (!board.isEmpty(k, newRow)) {
-				return Chess::MoveResponse::Failed;
-			}
-		}
-	}
-	//vertical
-	else if (dir == Forward || dir == Backward) {
-		for (int i = currentRow; i < newCol + (dir * -1); i++) {
-			int k = currentRow + (i * dir);
-			if (!board.isEmpty(newCol, k)) {
-				return Chess::MoveResponse::Failed;
-			}
-		}
+	//Create a pair to compare with the validCordinates pairs
+	std::pair<int, int> inputCordinates(newCol, newRow);
+
+	auto it = std::find(validCordinates.begin(), validCordinates.end(), inputCordinates);
+
+	if (it != validCordinates.end()) {
+		return !board.isEmpty(newCol, newRow) ? MoveResponse::Ate : MoveResponse::Moved;
 	}
 	else {
-		return Chess::MoveResponse::Failed;
+		return MoveResponse::Failed;
 	}
+}
 
-	//last tile
-	if (!board.isEmpty(newCol, newRow)) {
-		if (board.getColor(newCol, newRow) != color) {
-			return Chess::MoveResponse::Ate;
+
+void Chess::Rook::addSlidingMoves(std::vector<std::pair<int, int>> validCordinates, int start, int end, const Board& board, bool checkCol) {
+	bool result;
+	for (int i = start; i < end; i++) {
+		if (checkCol)
+			result = addIfValid(board, validCordinates, { i, currentRow });
+		else
+			result = addIfValid(board, validCordinates, { currentCol, i });
+		//if we found an enemy or friendly piece, return
+		if (!result) {
+			return;
 		}
-	}
-	else {
-		return Chess::MoveResponse::Moved;
 	}
 }

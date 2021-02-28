@@ -11,9 +11,7 @@ namespace Chess {
 	public:
 		Horse(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
 
-		MoveResponse checkMove(int newCol, int newRow, const Board& board) {
-			return Chess::MoveResponse::Ate;
-		}
+		MoveResponse checkMove(int newCol, int newRow, const Board& board);
 	};
 
 }

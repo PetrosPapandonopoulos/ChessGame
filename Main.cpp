@@ -5,10 +5,11 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+#include <map>
 
 void windowManager();
-void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f, const Chess::Board& mainBoard);
-void windowCycle(sf::RenderWindow&, sf::Sprite*, sf::Texture*, const sf::Vector2f, Chess::Board& mainBoard);
+void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f);
+void windowCycle(sf::RenderWindow&, sf::Sprite*, sf::Texture*, const sf::Vector2f);
 
 
 int main(int argc, char** argv) {
@@ -25,13 +26,14 @@ void windowManager() {
 	Chess::Board mainBoard;
 
 
-	loadSprites(piecesSprites, PiecesTextures, tileDim, mainBoard);
+	loadSprites(piecesSprites, PiecesTextures, tileDim);
 
-	windowCycle(window, piecesSprites, PiecesTextures, tileDim, mainBoard);
+	windowCycle(window, piecesSprites, PiecesTextures, tileDim);
 
 }
 
-void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim, Chess::Board& mainBoard) {
+void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim) {
+	Chess::Board mainBoard;
 	bool isMoving = false;
 	sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
 	sf::Vector2f InitTileDimension = tileDim;
@@ -135,15 +137,12 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 	}
 }
 
-void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim, const Chess::Board& board) {
+void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim) {
 
 	//load textures
 	for (int i = 0; i < 12; i++) {
 		chessPiecesTexture[i].loadFromFile("Sprites/tile" + std::to_string(i) + ".png");
 	}
-
-	//create sprites
-
 
 	//black pieces
 
