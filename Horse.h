@@ -8,6 +8,7 @@ namespace Chess {
 	class Board;
 
 	class Horse : public Piece {
+
 	public:
 		Horse(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
 
