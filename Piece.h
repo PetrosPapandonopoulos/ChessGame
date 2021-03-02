@@ -30,6 +30,8 @@ namespace Chess {
 
 		bool addIfValid(const Board& board, std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int>cordinates);
 
+		MoveResponse checkIfBelongs(std::vector<std::pair<int, int>> validCordinates, std::pair<int, int> inputCordinates, const Board& board);
+
 	public:
 		Color getColor() {
 			return color;

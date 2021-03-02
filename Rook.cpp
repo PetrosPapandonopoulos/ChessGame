@@ -17,17 +17,7 @@ Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& 
 	addSlidingMoves(validCordinates, currentRow + 1, 8, board, false);
 	addSlidingMoves(validCordinates, currentRow - 1, 0, board, false);
 
-	//Create a pair to compare with the validCordinates pairs
-	std::pair<int, int> inputCordinates(newCol, newRow);
-
-	auto it = std::find(validCordinates.begin(), validCordinates.end(), inputCordinates);
-
-	if (it != validCordinates.end()) {
-		return !board.isEmpty(newCol, newRow) ? MoveResponse::Ate : MoveResponse::Moved;
-	}
-	else {
-		return MoveResponse::Failed;
-	}
+	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
 }
 
 

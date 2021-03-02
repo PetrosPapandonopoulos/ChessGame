@@ -22,3 +22,15 @@ bool Chess::Piece::addIfValid(const Board& board, std::vector<std::pair<int, int
 		return false;
 	}
 }
+
+Chess::MoveResponse Chess::Piece::checkIfBelongs(std::vector<std::pair<int, int>> validCordinates, std::pair<int, int> inputCordinates, const Board& board) {
+
+	auto it = std::find(validCordinates.begin(), validCordinates.end(), inputCordinates);
+
+	if (it != validCordinates.end()) {
+		return !board.isEmpty(inputCordinates.first, inputCordinates.second) ? MoveResponse::Ate : MoveResponse::Moved;
+	}
+	else {
+		return MoveResponse::Failed;
+	}
+}

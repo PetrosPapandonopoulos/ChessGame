@@ -8,7 +8,6 @@ namespace Chess {
 	class Board;
 
 	class Rook: public Piece {
-
 	protected:
 		void addSlidingMoves(std::vector<std::pair<int, int>> validCordinates, int start, int end, const Board& board, bool checkRow);
 
