@@ -14,12 +14,19 @@ Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow, const Board& 
 
 	bool isAtStart = this->currentCol == 1 || this->currentCol == 6;
 
-	if (isAtStart)
-		addIfValid(board, validCordinates, { currentCol + (2 * direction), currentRow });
+	if (addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow }) && isAtStart) {
+		if (board.isEmpty(currentCol + (2 * direction), currentRow)) {
+			addIfValid(board, validCordinates, { currentCol + (2 * direction), currentRow });
+		}
+	}
 
-	addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow });
-	addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow + 1 });
-	addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow - 1 });
+	if (!board.isEmpty(currentCol + (1 * direction), currentRow + 1)) {
+		addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow + 1 });
+	}
+
+	if (!board.isEmpty(currentCol + (1 * direction), currentRow - 1)) {
+		addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow - 1 });
+	}
 
 	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
 }

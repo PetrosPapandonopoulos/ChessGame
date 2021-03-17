@@ -68,16 +68,17 @@ namespace Chess {
 
 		bool move(int currentCol, int CurrentRow, int newCol, int newRow) {
 			if (board[currentCol][CurrentRow] != nullptr) {
-				Chess::MoveResponse result = board[CurrentRow][CurrentRow]->checkMove(newCol, newRow, *this);
+				Chess::MoveResponse result = board[currentCol][CurrentRow]->checkMove(newCol, newRow, *this);
 				if (result == Chess::MoveResponse::Ate || result == Chess::MoveResponse::Moved) {
-					board[newCol][newRow] = nullptr;
-					board[newCol][newRow] = std::move(board[CurrentRow][CurrentRow]);
+					this->board[newCol][newRow] = std::move(this->board[currentCol][CurrentRow]);
 					board[currentCol][CurrentRow] = nullptr;
+					board[newCol][newRow]->setCurrentCol(newCol);
+					board[newCol][newRow]->setCurrentRow(newRow);
+					return true;
 				}
 			}
+			return false;
 		}
-
-
 
 		bool isEmpty(int row, int col) const {
 			return board[row][col] == nullptr;
@@ -86,12 +87,6 @@ namespace Chess {
 		Color getColor(int col, int row) const {
 			return board[col][row]->getColor();
 		}
-
-
-
-
-
-
 	};
 }
 

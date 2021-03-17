@@ -20,22 +20,13 @@ Chess::MoveResponse Chess::Horse::checkMove(int newCol, int newRow, const Board&
 
 
 void Chess::Horse::addHopMoves(std::vector<std::pair<int, int>> validCordinates, int Direction, const Board& board, bool checkCol) {
-	if (Direction >= 0 && Direction <= 7) {
-		if (checkCol) {
-			if (this->currentRow + 1 <= 7) {
-				addIfValid(board, validCordinates, { Direction, this->currentRow + 1 });
-			}
-			if (this->currentRow - 1 >= 0) {
-				addIfValid(board, validCordinates, { Direction, this->currentRow - 1 });
-			}
-		}
-		else {
-			if (this->currentCol + 1 <= 7) {
-				addIfValid(board, validCordinates, { this->currentCol + 1, Direction });
-			}
-			if (this->currentCol - 1 >= 0) {
-				addIfValid(board, validCordinates, { this->currentCol - 1, Direction });
-			}
-		}
+	
+	if (checkCol) {
+		addIfValid(board, validCordinates, { Direction, this->currentRow + 1 });
+		addIfValid(board, validCordinates, { Direction, this->currentRow - 1 });
+	}
+	else {
+		addIfValid(board, validCordinates, { this->currentCol + 1, Direction });
+		addIfValid(board, validCordinates, { this->currentCol - 1, Direction });
 	}
 }

@@ -7,8 +7,10 @@
 #include <string>
 #include <map>
 
+#define WINDOW_SIZE		900
+
 void windowManager();
-void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f);
+void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f, int windowSize);
 void windowCycle(sf::RenderWindow&, sf::Sprite*, sf::Texture*, const sf::Vector2f);
 
 
@@ -19,14 +21,15 @@ int main(int argc, char** argv) {
 }
 
 void windowManager() {
-	sf::RenderWindow  window(sf::VideoMode(900, 900), "Chess game");
+	sf::RenderWindow  window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess game");
 	sf::Sprite piecesSprites[32];
 	sf::Texture PiecesTextures[12];
 	sf::Vector2f tileDim(window.getSize().x / 8.0, window.getSize().y / 8.0);
 	Chess::Board mainBoard;
+	int windowSize = WINDOW_SIZE;
 
 
-	loadSprites(piecesSprites, PiecesTextures, tileDim);
+	loadSprites(piecesSprites, PiecesTextures, tileDim, windowSize);
 
 	windowCycle(window, piecesSprites, PiecesTextures, tileDim);
 
@@ -38,6 +41,7 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 	sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
 	sf::Vector2f InitTileDimension = tileDim;
 	sf::Vector2i latestTile;
+
 
 	while (window.isOpen()) {
 
@@ -80,24 +84,16 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 				//when you leave a piece change isMoving
 				isMoving = false;
 
-
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
 				sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int)tileDim.x), mousePosition.y / ((int)tileDim.y));
 
 				//if the cordinates are not out of borders
 				if (mousePositionOnBoard.x >= 0 && mousePositionOnBoard.x < 8 && mousePositionOnBoard.y >= 0 && mousePositionOnBoard.y < 8) {
-
-					if (mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
-						//set the tile centered in the tile the user choose
-						piecesSprites[mainBoard.board[latestTile.y][latestTile.x]->getNumOfSprite()].setPosition((mousePosition.x / ((int)tileDim.x)) * tileDim.x,
+					//set the tile centered in the tile the user choose
+					if (mainBoard.move(latestTile.y, latestTile.x, mousePositionOnBoard.y, mousePositionOnBoard.x)) {
+						piecesSprites[mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x]->getNumOfSprite()].setPosition((mousePosition.x / ((int)tileDim.x)) * tileDim.x,
 							(mousePosition.y / ((int)tileDim.y)) * tileDim.y);
-
-						//update board
-						mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x] = std::move(mainBoard.board[latestTile.y][latestTile.x]);
-
-						mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x]->setCurrentCol(mousePositionOnBoard.x);
-						mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x]->setCurrentRow(mousePositionOnBoard.y);
 					}
 					else {
 						piecesSprites[mainBoard.board[latestTile.y][latestTile.x]->getNumOfSprite()].setPosition(latestTile.x * tileDim.x, latestTile.y* tileDim.y);
@@ -137,11 +133,12 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 	}
 }
 
-void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim) {
+void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim, int windowSize) {
 
 	//load textures
 	for (int i = 0; i < 12; i++) {
 		chessPiecesTexture[i].loadFromFile("Sprites/tile" + std::to_string(i) + ".png");
+		chessPiecesTexture[i].setSmooth(true);
 	}
 
 	//black pieces
@@ -223,5 +220,9 @@ void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf:
 	for (int i = 0; i < 8; i++) {
 		piecesSprites[24 + i].setTexture(chessPiecesTexture[11]);
 		piecesSprites[24 + i].setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * 6));
+	}
+
+	for (int i = 0; i < 32; i++) {
+		piecesSprites[i].setScale(sf::Vector2f(tileDim.x / piecesSprites[i].getLocalBounds().width, tileDim.y / piecesSprites[i].getLocalBounds().height));
 	}
 }

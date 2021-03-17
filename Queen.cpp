@@ -24,7 +24,7 @@ Chess::MoveResponse Chess::Queen::checkMove(int newCol, int newRow, const Board&
 	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
 }
 
-
+//to be fixed into one (the method will be written in piece)
 
 void Chess::Queen::addSlidingMovesHorVer(std::vector<std::pair<int, int>> validCordinates, int start, int end, const Board& board, bool checkCol) {
 	bool result;
