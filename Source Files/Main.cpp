@@ -1,19 +1,19 @@
 #include "Board.h"
-#include "Pawn.h"
-#include "Rook.h"
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
-#include <map>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 #define WINDOW_SIZE		900
 
 void windowManager();
-void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f, int windowSize);
 void windowCycle(sf::RenderWindow&, sf::Sprite*, sf::Texture*, const sf::Vector2f);
-void drawTiles(sf::RenderWindow& window, sf::Vector2f tileDim);
-
+void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f, int);
+void drawTiles(sf::RenderWindow&, sf::Vector2f);
+void drawBoardPieces(sf::RenderWindow&, sf::Sprite*, const Chess::Board&);
+void placeAPieceBack(sf::Sprite*, const Chess::Board&, sf::Vector2i, sf::Vector2f);
+void setNewPosition(sf::Sprite*, const Chess::Board&, sf::Vector2i, sf::Vector2i, sf::Vector2f);
+bool checkBounds(sf::Vector2i);
 
 int main(int argc, char** argv) {
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 }
 
 void windowManager() {
-	sf::RenderWindow  window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess game");
+	sf::RenderWindow  window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess game", sf::Style::Close);
 	sf::Sprite piecesSprites[32];
 	sf::Texture PiecesTextures[12];
 	sf::Vector2f tileDim(window.getSize().x / 8.0, window.getSize().y / 8.0);
@@ -37,10 +37,10 @@ void windowManager() {
 }
 
 void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim) {
+
 	Chess::Board mainBoard;
-	bool isMoving = false;
-	sf::Vector2f InitTileDimension = tileDim;
-	sf::Vector2i latestTile;
+	bool MovingAPiece = false;
+	sf::Vector2i pieceLastPosition;
 
 
 	while (window.isOpen()) {
@@ -49,14 +49,8 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 
 		while (window.pollEvent(event)) {
 
-
 			if (event.type == sf::Event::Closed) {
 				window.close();
-			}
-
-			if (event.type == sf::Event::Resized) {
-				InitTileDimension.x = window.getSize().x / 8.0;
-				InitTileDimension.y = window.getSize().y / 8.0;
 			}
 
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
@@ -64,64 +58,51 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 				sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int)tileDim.x), mousePosition.y / ((int)tileDim.y));
 
-				//if the tile has a piece on it, or you have already a piece picked up
-				if (!mainBoard.isEmpty(mousePositionOnBoard.y,mousePositionOnBoard.x) || isMoving) {
-					//if you have not picked up a piece
-					if (!isMoving) {
-						//then change isMoving
-						isMoving = true;
-						//save the last cordinates of the piece you picked up
-						latestTile = mousePositionOnBoard;
+				if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x) || MovingAPiece) {
+
+					if (!MovingAPiece) {
+						MovingAPiece = true;
+						pieceLastPosition = mousePositionOnBoard;
 					}
-					//sprite follow the cursor
-					int index = mainBoard.board[latestTile.y][latestTile.x]->getNumOfSprite();
-					piecesSprites[index].setPosition((mousePosition.x - InitTileDimension.x / 2),
-						(mousePosition.y - InitTileDimension.y / 2));
+
+					//sprite follow cursor
+					//int index = mainBoard.board[pieceLastPosition.y][pieceLastPosition.x]->getNumOfSprite();
+					int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
+					float newX = mousePosition.x - tileDim.x / 2;
+					float newY = mousePosition.y - tileDim.y / 2;
+					piecesSprites[index].setPosition(newX, newY);
 				}
 			}
 
-			if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && isMoving) {
-				//when you leave a piece change isMoving
-				isMoving = false;
+			if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && MovingAPiece) {
+
+				MovingAPiece = false;
 
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
 				sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int)tileDim.x), mousePosition.y / ((int)tileDim.y));
 
-				//if the cordinates are not out of borders
-				if (mousePositionOnBoard.x >= 0 && mousePositionOnBoard.x < 8 && mousePositionOnBoard.y >= 0 && mousePositionOnBoard.y < 8) {
-					//set the tile centered in the tile the user choose
-					if (mainBoard.move(latestTile.y, latestTile.x, mousePositionOnBoard.y, mousePositionOnBoard.x)) {
-						piecesSprites[mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x]->getNumOfSprite()].setPosition((mousePosition.x / ((int)tileDim.x)) * tileDim.x,
-							(mousePosition.y / ((int)tileDim.y)) * tileDim.y);
+				if (checkBounds(mousePositionOnBoard)) {
+
+					if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y, mousePositionOnBoard.x)) {
+						setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
 					}
 					else {
-						piecesSprites[mainBoard.board[latestTile.y][latestTile.x]->getNumOfSprite()].setPosition(latestTile.x * tileDim.x, latestTile.y* tileDim.y);
+						placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
 					}
 				}
 				else {
-					//if the user tried to place a piece out of order, return it to its original potition
-					//not working :p
-					piecesSprites[mainBoard.board[latestTile.y][latestTile.x]->getNumOfSprite()].setPosition(latestTile.x * tileDim.x, latestTile.y * tileDim.y);
+					placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
 				}
 			}
 		}
 
-		//clear previous frame
 		window.clear(sf::Color::Black);
 
-		//draw new frame
 		drawTiles(window, tileDim);
 
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (!mainBoard.isEmpty(i, j)) {
-					window.draw(piecesSprites[mainBoard.board[i][j]->getNumOfSprite()]);
-				}
-			}
-		}
+		drawBoardPieces(window, piecesSprites, mainBoard);
 
-		//display new frame
 		window.display();
 	}
 }
@@ -236,4 +217,34 @@ void drawTiles(sf::RenderWindow& window, sf::Vector2f tileDim) {
 			window.draw(square);
 		}
 	}
+}
+
+void drawBoardPieces(sf::RenderWindow& window, sf::Sprite* piecesSprites, const Chess::Board& mainBoard) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (!mainBoard.isEmpty(i, j)) {
+				window.draw(piecesSprites[mainBoard.getNumOfSprite(i, j)]);
+			}
+		}
+	}
+}
+
+void placeAPieceBack(sf::Sprite* piecesSprites, const Chess::Board& mainBoard, sf::Vector2i lastTileClicked, sf::Vector2f tileDim) {
+	//int index = mainBoard.board[lastTileClicked.y][lastTileClicked.x]->getNumOfSprite();
+	int index = mainBoard.getNumOfSprite(lastTileClicked.y, lastTileClicked.x);
+	float newX = lastTileClicked.x * tileDim.x;
+	float newY = lastTileClicked.y * tileDim.y;
+	piecesSprites[index].setPosition(newX, newY);
+}
+
+void setNewPosition(sf::Sprite* piecesSprites, const Chess::Board& mainBoard, sf::Vector2i mousePositionOnBoard, sf::Vector2i mousePosition, sf::Vector2f tileDim) {
+	//int index = mainBoard.board[mousePositionOnBoard.y][mousePositionOnBoard.x]->getNumOfSprite();
+	int index = mainBoard.getNumOfSprite(mousePositionOnBoard.y, mousePositionOnBoard.x);
+	float newX = (mousePosition.x / ((int)tileDim.x)) * tileDim.x;
+	float newY = (mousePosition.y / ((int)tileDim.y)) * tileDim.y;
+	piecesSprites[index].setPosition(newX, newY);
+}
+
+bool checkBounds(sf::Vector2i mousePositionOnBoard) {
+	return mousePositionOnBoard.x >= 0 && mousePositionOnBoard.x < 8 && mousePositionOnBoard.y >= 0 && mousePositionOnBoard.y < 8;
 }

@@ -10,14 +10,11 @@ namespace Chess {
 	class Rook: public Piece {
 	protected:
 		void addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, int start, int end, int dir, const Board& board, bool checkRow);
-
 	public:
-		Rook(Color color, int currentCol, int currentRow, int numOfSprite): Piece(color, currentCol, currentRow, numOfSprite)
-		{ }
+		Rook(Color color, int currentCol, int currentRow, int numOfSprite): Piece(color, currentCol, currentRow, numOfSprite) {}
 
 		MoveResponse checkMove(int newCol, int newRow, const Board& board);
-
 	};
 }
 
-#endif
+#endif //!ROOK_H

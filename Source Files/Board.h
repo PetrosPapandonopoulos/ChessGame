@@ -13,9 +13,9 @@
 
 namespace Chess {
 	class Board {
-
-	public:
+	private:
 		std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
+	public:
 
 		Board() {
 			//Black pieces
@@ -86,6 +86,10 @@ namespace Chess {
 
 		Color getColor(int col, int row) const {
 			return board[col][row]->getColor();
+		}
+
+		int getNumOfSprite(int i, int j) const{
+			return board[i][j]->getNumOfSprite();
 		}
 	};
 }

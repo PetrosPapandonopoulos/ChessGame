@@ -163,6 +163,12 @@
     <ClInclude Include="Source Files\Queen.h" />
     <ClInclude Include="Source Files\Rook.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Screenshot\Screenshot01.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
