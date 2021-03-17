@@ -12,6 +12,7 @@
 void windowManager();
 void loadSprites(sf::Sprite*, sf::Texture*, const sf::Vector2f, int windowSize);
 void windowCycle(sf::RenderWindow&, sf::Sprite*, sf::Texture*, const sf::Vector2f);
+void drawTiles(sf::RenderWindow& window, sf::Vector2f tileDim);
 
 
 int main(int argc, char** argv) {
@@ -38,7 +39,6 @@ void windowManager() {
 void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf::Vector2f tileDim) {
 	Chess::Board mainBoard;
 	bool isMoving = false;
-	sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
 	sf::Vector2f InitTileDimension = tileDim;
 	sf::Vector2i latestTile;
 
@@ -111,21 +111,14 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 		window.clear(sf::Color::Black);
 
 		//draw new frame
+		drawTiles(window, tileDim);
+
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				if (i % 2 == j % 2) {
-					square.setFillColor(sf::Color(238, 238, 213));
+				if (!mainBoard.isEmpty(i, j)) {
+					window.draw(piecesSprites[mainBoard.board[i][j]->getNumOfSprite()]);
 				}
-				else {
-					square.setFillColor(sf::Color(148, 118, 93));
-				}
-				square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
-				window.draw(square);
 			}
-
-		}
-		for (int i = 0; i < 32; i++) {
-			window.draw(piecesSprites[i]);
 		}
 
 		//display new frame
@@ -224,5 +217,23 @@ void loadSprites(sf::Sprite* piecesSprites, sf::Texture* chessPiecesTexture, sf:
 
 	for (int i = 0; i < 32; i++) {
 		piecesSprites[i].setScale(sf::Vector2f(tileDim.x / piecesSprites[i].getLocalBounds().width, tileDim.y / piecesSprites[i].getLocalBounds().height));
+	}
+}
+
+void drawTiles(sf::RenderWindow& window, sf::Vector2f tileDim) {
+
+	sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
+
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (i % 2 == j % 2) {
+				square.setFillColor(sf::Color(238, 238, 213));
+			}
+			else {
+				square.setFillColor(sf::Color(148, 118, 93));
+			}
+			square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
+			window.draw(square);
+		}
 	}
 }

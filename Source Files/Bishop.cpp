@@ -16,7 +16,7 @@ Chess::MoveResponse Chess::Bishop::checkMove(int newCol, int newRow, const Board
 	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
 }
 
-void Chess::Bishop::addSlidingMoves(std::vector<std::pair<int, int>> validCordinates, std::pair<int, int> direction, const Board& board) {
+void Chess::Bishop::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
 	int toBeCheckedCol = this->currentCol + direction.first;
 	int toBeCheckedRow = this->currentRow + direction.second;
 	bool result;

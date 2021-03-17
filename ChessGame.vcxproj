@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -144,24 +144,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bishop.cpp" />
-    <ClCompile Include="Horse.cpp" />
-    <ClCompile Include="King.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Pawn.cpp" />
-    <ClCompile Include="Piece.cpp" />
-    <ClCompile Include="Queen.cpp" />
-    <ClCompile Include="Rook.cpp" />
+    <ClCompile Include="Source Files\Bishop.cpp" />
+    <ClCompile Include="Source Files\Horse.cpp" />
+    <ClCompile Include="Source Files\King.cpp" />
+    <ClCompile Include="Source Files\Main.cpp" />
+    <ClCompile Include="Source Files\Pawn.cpp" />
+    <ClCompile Include="Source Files\Piece.cpp" />
+    <ClCompile Include="Source Files\Queen.cpp" />
+    <ClCompile Include="Source Files\Rook.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bishop.h" />
-    <ClInclude Include="Board.h" />
-    <ClInclude Include="Horse.h" />
-    <ClInclude Include="King.h" />
-    <ClInclude Include="Pawn.h" />
-    <ClInclude Include="Piece.h" />
-    <ClInclude Include="Queen.h" />
-    <ClInclude Include="Rook.h" />
+    <ClInclude Include="Source Files\Bishop.h" />
+    <ClInclude Include="Source Files\Board.h" />
+    <ClInclude Include="Source Files\Horse.h" />
+    <ClInclude Include="Source Files\King.h" />
+    <ClInclude Include="Source Files\Pawn.h" />
+    <ClInclude Include="Source Files\Piece.h" />
+    <ClInclude Include="Source Files\Queen.h" />
+    <ClInclude Include="Source Files\Rook.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

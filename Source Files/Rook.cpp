@@ -10,10 +10,10 @@ Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& 
 
 	std::vector<std::pair<int, int>> validCordinates;
 
-	//vertical check
+	//horizontal check
 	addSlidingMoves(validCordinates, currentCol + 1, 8, 1, board, true);
 	addSlidingMoves(validCordinates, currentCol - 1, 0, -1, board, true);
-	//horizontal check
+	//vertical check
 	addSlidingMoves(validCordinates, currentRow + 1, 8, 1, board, false);
 	addSlidingMoves(validCordinates, currentRow - 1, 0, -1, board, false);
 
@@ -36,7 +36,7 @@ void Chess::Rook::addSlidingMoves(std::vector<std::pair<int, int>>& validCordina
 		}
 	}
 	else {
-		for (int i = start; i > end; i += dir) {
+		for (int i = start; i >= end; i += dir) {
 			if (checkCol)
 				result = addIfValid(board, validCordinates, { i, currentRow });
 			else

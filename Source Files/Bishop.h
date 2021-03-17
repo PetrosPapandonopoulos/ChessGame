@@ -9,7 +9,7 @@ namespace Chess {
 
 	class Bishop : public Piece {
 	protected:
-		void addSlidingMoves(std::vector<std::pair<int, int>> validCordinates, std::pair<int, int> direction, const Board& board);
+		void addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board);
 	public:
 		Bishop(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
 

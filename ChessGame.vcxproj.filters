@@ -15,55 +15,55 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Source Files\Bishop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pawn.cpp">
+    <ClCompile Include="Source Files\Horse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rook.cpp">
+    <ClCompile Include="Source Files\King.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Piece.cpp">
+    <ClCompile Include="Source Files\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Horse.cpp">
+    <ClCompile Include="Source Files\Pawn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bishop.cpp">
+    <ClCompile Include="Source Files\Piece.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Queen.cpp">
+    <ClCompile Include="Source Files\Queen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="King.cpp">
+    <ClCompile Include="Source Files\Rook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Piece.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Bishop.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Board.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Board.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pawn.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Horse.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rook.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\King.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Horse.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Pawn.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bishop.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Piece.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Queen.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Queen.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="King.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source Files\Rook.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

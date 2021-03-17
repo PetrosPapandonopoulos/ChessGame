@@ -14,9 +14,14 @@ Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow, const Board& 
 
 	bool isAtStart = this->currentCol == 1 || this->currentCol == 6;
 
-	if (addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow }) && isAtStart) {
-		if (board.isEmpty(currentCol + (2 * direction), currentRow)) {
-			addIfValid(board, validCordinates, { currentCol + (2 * direction), currentRow });
+	if (board.isEmpty(currentCol + (1 * direction), currentRow)) {
+
+		addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow });
+
+		if (isAtStart && board.isEmpty(currentCol + (2 * direction), currentRow)) {
+			if (board.isEmpty(currentCol + (2 * direction), currentRow)) {
+				addIfValid(board, validCordinates, { currentCol + (2 * direction), currentRow });
+			}
 		}
 	}
 
