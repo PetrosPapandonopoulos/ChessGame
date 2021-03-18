@@ -340,3 +340,7 @@ ASALocalRun/
 healthchecksdb
 
 *.dll
+
+SFML-2.5.1/
+
+cmake-build-debug/
