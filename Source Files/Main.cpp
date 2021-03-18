@@ -14,6 +14,7 @@ void drawBoardPieces(sf::RenderWindow&, sf::Sprite*, const Chess::Board&);
 void placeAPieceBack(sf::Sprite*, const Chess::Board&, sf::Vector2i, sf::Vector2f);
 void setNewPosition(sf::Sprite*, const Chess::Board&, sf::Vector2i, sf::Vector2i, sf::Vector2f);
 bool checkBounds(sf::Vector2i);
+bool checkTurn(const Chess::Board&, sf::Vector2i);
 
 int main(int argc, char** argv) {
 
@@ -40,6 +41,7 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 
 	Chess::Board mainBoard;
 	bool MovingAPiece = false;
+
 	sf::Vector2i pieceLastPosition;
 
 
@@ -58,15 +60,17 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 				sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int)tileDim.x), mousePosition.y / ((int)tileDim.y));
 
-				if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x) || MovingAPiece) {
-
-					if (!MovingAPiece) {
-						MovingAPiece = true;
-						pieceLastPosition = mousePositionOnBoard;
+				if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
+					if (checkTurn(mainBoard, mousePositionOnBoard)) {
+						if (!MovingAPiece) {
+							MovingAPiece = true;
+							pieceLastPosition = mousePositionOnBoard;
+						}
 					}
+				}
 
-					//sprite follow cursor
-					//int index = mainBoard.board[pieceLastPosition.y][pieceLastPosition.x]->getNumOfSprite();
+				if (MovingAPiece) {
+					//drag piece with cursor
 					int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
 					float newX = mousePosition.x - tileDim.x / 2;
 					float newY = mousePosition.y - tileDim.y / 2;
@@ -79,13 +83,13 @@ void windowCycle(sf::RenderWindow& window, sf::Sprite* piecesSprites, sf::Textur
 				MovingAPiece = false;
 
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-
 				sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int)tileDim.x), mousePosition.y / ((int)tileDim.y));
 
 				if (checkBounds(mousePositionOnBoard)) {
 
 					if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y, mousePositionOnBoard.x)) {
 						setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
+						mainBoard.nextTurn();
 					}
 					else {
 						placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
@@ -247,4 +251,8 @@ void setNewPosition(sf::Sprite* piecesSprites, const Chess::Board& mainBoard, sf
 
 bool checkBounds(sf::Vector2i mousePositionOnBoard) {
 	return mousePositionOnBoard.x >= 0 && mousePositionOnBoard.x < 8 && mousePositionOnBoard.y >= 0 && mousePositionOnBoard.y < 8;
+}
+
+bool checkTurn(const Chess::Board& mainBoard, sf::Vector2i mousePositionOnBoard) {
+	return mainBoard.getColor(mousePositionOnBoard.y, mousePositionOnBoard.x) == mainBoard.getWhoseTurn();
 }

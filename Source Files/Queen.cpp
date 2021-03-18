@@ -2,8 +2,9 @@
 #include "Queen.h"
 #include <vector>
 
+using namespace Chess;
 
-Chess::MoveResponse Chess::Queen::checkMove(int newCol, int newRow, const Board& board) {
+MoveResponse Queen::checkMove(int newCol, int newRow, const Board& board) {
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
 	std::vector<std::pair<int, int>> validCordinates;
@@ -26,7 +27,7 @@ Chess::MoveResponse Chess::Queen::checkMove(int newCol, int newRow, const Board&
 
 //to be fixed into one (the method will be written in piece)
 
-void Chess::Queen::addSlidingMovesHorVer(std::vector<std::pair<int, int>>& validCordinates, int start, int end, int dir, const Board& board, bool checkCol) {
+void Queen::addSlidingMovesHorVer(std::vector<std::pair<int, int>>& validCordinates, int start, int end, int dir, const Board& board, bool checkCol) {
 	bool result;
 	if (dir == 1) {
 		for (int i = start; i < end; i += dir) {
@@ -54,7 +55,7 @@ void Chess::Queen::addSlidingMovesHorVer(std::vector<std::pair<int, int>>& valid
 	}
 }
 
-void Chess::Queen::addSlidingMovesDiagonal(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
+void Queen::addSlidingMovesDiagonal(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
 	int toBeCheckedCol = this->currentCol + direction.first;
 	int toBeCheckedRow = this->currentRow + direction.second;
 	bool result;

@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source Files\Bishop.cpp" />
+    <ClCompile Include="Source Files\Board.cpp" />
     <ClCompile Include="Source Files\Horse.cpp" />
     <ClCompile Include="Source Files\King.cpp" />
     <ClCompile Include="Source Files\Main.cpp" />

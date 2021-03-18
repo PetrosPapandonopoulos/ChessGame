@@ -2,8 +2,9 @@
 #include "Rook.h"
 #include <vector>
 
-// todo: extra valid move for rook named "Castling"
-Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& board) {
+using namespace Chess;
+
+MoveResponse Rook::checkMove(int newCol, int newRow, const Board& board) {
 
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
@@ -21,7 +22,7 @@ Chess::MoveResponse Chess::Rook::checkMove(int newCol, int newRow, const Board& 
 }
 
 
-void Chess::Rook::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, int start, int end, int dir, const Board& board, bool checkCol) {
+void Rook::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, int start, int end, int dir, const Board& board, bool checkCol) {
 	bool result;
 	if (dir == 1) {
 		for (int i = start; i < end; i += dir) {
@@ -48,3 +49,5 @@ void Chess::Rook::addSlidingMoves(std::vector<std::pair<int, int>>& validCordina
 		}
 	}
 }
+
+// todo: extra valid move for rook named "Castling"

@@ -2,7 +2,9 @@
 #include "Bishop.h"
 #include <vector>
 
-Chess::MoveResponse Chess::Bishop::checkMove(int newCol, int newRow, const Board& board) {
+using namespace Chess;
+
+MoveResponse Bishop::checkMove(int newCol, int newRow, const Board& board) {
 
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
@@ -16,7 +18,7 @@ Chess::MoveResponse Chess::Bishop::checkMove(int newCol, int newRow, const Board
 	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
 }
 
-void Chess::Bishop::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
+void Bishop::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
 	int toBeCheckedCol = this->currentCol + direction.first;
 	int toBeCheckedRow = this->currentRow + direction.second;
 	bool result;

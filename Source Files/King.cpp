@@ -2,7 +2,9 @@
 #include "King.h"
 #include <vector>
 
-Chess::MoveResponse Chess::King::checkMove(int newCol, int newRow, const Board& board) {
+using namespace Chess;
+
+MoveResponse King::checkMove(int newCol, int newRow, const Board& board) {
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
 	std::vector<std::pair<int, int>> validCordinates;

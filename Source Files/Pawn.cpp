@@ -2,7 +2,9 @@
 #include "Pawn.h"
 #include <vector>
 
-Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow, const Board& board) {
+using namespace Chess;
+
+MoveResponse Pawn::checkMove(int newCol, int newRow, const Board& board) {
 
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
@@ -12,13 +14,13 @@ Chess::MoveResponse Chess::Pawn::checkMove(int newCol, int newRow, const Board& 
 	*of the forward tiles below*/
 	int direction = this->color == Color::Black ? 1 : -1;
 
-	bool isAtStart = this->currentCol == 1 || this->currentCol == 6;
+	bool hasNotMoved = this->currentCol == 1 || this->currentCol == 6;
 
 	if (board.isEmpty(currentCol + (1 * direction), currentRow)) {
 
 		addIfValid(board, validCordinates, { currentCol + (1 * direction), currentRow });
 
-		if (isAtStart && board.isEmpty(currentCol + (2 * direction), currentRow)) {
+		if (hasNotMoved && board.isEmpty(currentCol + (2 * direction), currentRow)) {
 			if (board.isEmpty(currentCol + (2 * direction), currentRow)) {
 				addIfValid(board, validCordinates, { currentCol + (2 * direction), currentRow });
 			}

@@ -2,7 +2,9 @@
 #include "Horse.h"
 #include <vector>
 
-Chess::MoveResponse Chess::Horse::checkMove(int newCol, int newRow, const Board& board) {
+using namespace Chess;
+
+MoveResponse Horse::checkMove(int newCol, int newRow, const Board& board) {
 
 	/* A vector used to store all the possible moves a pawn can make
 	*based on its current cordinates*/
@@ -19,7 +21,7 @@ Chess::MoveResponse Chess::Horse::checkMove(int newCol, int newRow, const Board&
 }
 
 
-void Chess::Horse::addHopMoves(std::vector<std::pair<int, int>>& validCordinates, int Direction, const Board& board, bool checkCol) {
+void Horse::addHopMoves(std::vector<std::pair<int, int>>& validCordinates, int Direction, const Board& board, bool checkCol) {
 	
 	if (checkCol) {
 		addIfValid(board, validCordinates, { Direction, this->currentRow + 1 });
