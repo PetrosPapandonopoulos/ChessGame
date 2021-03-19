@@ -6,16 +6,17 @@
 
 namespace Chess {
 
-	class Board;
+    class Board;
 
-	class Pawn : public Piece {
+    class Pawn : public Piece {
 
-	public:
-		Pawn(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
+    public:
+        Pawn(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow,
+                                                                                   numOfSprite) {}
 
-		MoveResponse checkMove(int newCol, int newRow, const Board& board);
+        MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
 
-	};
+    };
 }
 
 #endif // !PAWN_H 

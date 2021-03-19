@@ -5,14 +5,15 @@
 
 namespace Chess {
 
-	class Board;
+    class Board;
 
-	class King : public Piece {
-	public:
-		King(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
+    class King : public Piece {
+    public:
+        King(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow,
+                                                                                   numOfSprite) {}
 
-		MoveResponse checkMove(int newCol, int newRow, const Board& board);
-	};
+        MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
+    };
 
 }
 

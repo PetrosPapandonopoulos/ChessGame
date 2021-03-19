@@ -1,40 +1,37 @@
 #ifndef BOARD_H
 #define BOARD_H
-#define BOARD_SIZE	8
+#define BOARD_SIZE    8
 
 #include "Piece.h"
-#include "Rook.h"
-#include "Pawn.h"
-#include "Bishop.h"
-#include "King.h"
-#include "Queen.h"
-#include "Horse.h"
 #include <memory>
 
 namespace Chess {
 
-	class Board {
-	private:
+    class Board {
+    private:
 
-		std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
-		Color turnFor;
+        std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
+        Color turnFor;
 
-	public:
+        void unMove(int currentCol, int CurrentRow, int newCol, int newRow, std::unique_ptr<Piece> &pieceEaten);
+        void unMove(int currentCol, int CurrentRow, int newCol, int newRow);
 
-		Board();
+    public:
 
-		bool move(int currentCol, int CurrentRow, int newCol, int newRow);
+        Board();
 
-		bool isEmpty(int row, int col) const;
+        bool move(int currentCol, int CurrentRow, int newCol, int newRow);
 
-		Color getColor(int col, int row) const;
+        bool isEmpty(int row, int col) const;
 
-		int getNumOfSprite(int i, int j) const;
+        Color getColor(int col, int row) const;
 
-		Color getWhoseTurn() const;
+        int getNumOfSprite(int i, int j) const;
 
-		void nextTurn();
-	};
+        Color getWhoseTurn() const;
+
+        void nextTurn();
+    };
 }
 
 #endif // !BOARD_H

@@ -4,21 +4,21 @@
 
 using namespace Chess;
 
-MoveResponse King::checkMove(int newCol, int newRow, const Board& board) {
-	/* A vector used to store all the possible moves a pawn can make
-	*based on its current cordinates*/
-	std::vector<std::pair<int, int>> validCordinates;
+MoveResponse King::checkMove(int newCol, int newRow, const Board &board) {
+    /* A vector used to store all the possible moves a pawn can make
+    *based on its current coordinates*/
+    std::vector<std::pair<int, int>> validCoordinates;
 
-	addIfValid(board, validCordinates, { this->currentCol + 1, this->currentRow });
-	addIfValid(board, validCordinates, { this->currentCol + 1, this->currentRow + 1 });
-	addIfValid(board, validCordinates, { this->currentCol + 1, this->currentRow - 1 });
+    addIfValid(board, validCoordinates, {this->currentCol + 1, this->currentRow});
+    addIfValid(board, validCoordinates, {this->currentCol + 1, this->currentRow + 1});
+    addIfValid(board, validCoordinates, {this->currentCol + 1, this->currentRow - 1});
 
-	addIfValid(board, validCordinates, { this->currentCol - 1, this->currentRow });
-	addIfValid(board, validCordinates, { this->currentCol - 1, this->currentRow + 1 });
-	addIfValid(board, validCordinates, { this->currentCol - 1, this->currentRow - 1 });
+    addIfValid(board, validCoordinates, {this->currentCol - 1, this->currentRow});
+    addIfValid(board, validCoordinates, {this->currentCol - 1, this->currentRow + 1});
+    addIfValid(board, validCoordinates, {this->currentCol - 1, this->currentRow - 1});
 
-	addIfValid(board, validCordinates, { this->currentCol, this->currentRow + 1 });
-	addIfValid(board, validCordinates, { this->currentCol, this->currentRow - 1 });
+    addIfValid(board, validCoordinates, {this->currentCol, this->currentRow + 1});
+    addIfValid(board, validCoordinates, {this->currentCol, this->currentRow - 1});
 
-	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
+    return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }

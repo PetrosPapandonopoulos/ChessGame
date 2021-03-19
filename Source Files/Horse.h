@@ -5,17 +5,19 @@
 
 namespace Chess {
 
-	class Board;
+    class Board;
 
-	class Horse : public Piece {
-	private:
-		void addHopMoves(std::vector<std::pair<int, int>>& validCordinates, int Direction, const Board& board, bool checkCol);
+    class Horse : public Piece {
+    private:
+        void addHopMoves(std::vector<std::pair<int, int>> &validCoordinates, int Direction, const Board &board,
+                         bool checkCol);
 
-	public:
-		Horse(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow, numOfSprite) {}
+    public:
+        Horse(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow,
+                                                                                    numOfSprite) {}
 
-		MoveResponse checkMove(int newCol, int newRow, const Board& board);
-	};
+        MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
+    };
 
 }
 

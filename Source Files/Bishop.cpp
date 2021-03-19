@@ -4,32 +4,33 @@
 
 using namespace Chess;
 
-MoveResponse Bishop::checkMove(int newCol, int newRow, const Board& board) {
+MoveResponse Bishop::checkMove(int newCol, int newRow, const Board &board) {
 
-	/* A vector used to store all the possible moves a pawn can make
-	*based on its current cordinates*/
-	std::vector<std::pair<int, int>> validCordinates;
+    /* A vector used to store all the possible moves a pawn can make
+    *based on its current coordinates*/
+    std::vector<std::pair<int, int>> validCoordinates;
 
-	addSlidingMoves(validCordinates, { -1, -1 }, board);
-	addSlidingMoves(validCordinates, { +1, +1 }, board);
-	addSlidingMoves(validCordinates, { -1, +1 }, board);
-	addSlidingMoves(validCordinates, { +1, -1 }, board);
+    addSlidingMoves(validCoordinates, {-1, -1}, board);
+    addSlidingMoves(validCoordinates, {+1, +1}, board);
+    addSlidingMoves(validCoordinates, {-1, +1}, board);
+    addSlidingMoves(validCoordinates, {+1, -1}, board);
 
-	return checkIfBelongs(validCordinates, { newCol, newRow }, board);
+    return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }
 
-void Bishop::addSlidingMoves(std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int> direction, const Board& board) {
-	int toBeCheckedCol = this->currentCol + direction.first;
-	int toBeCheckedRow = this->currentRow + direction.second;
-	bool result;
+void Bishop::addSlidingMoves(std::vector<std::pair<int, int>> &validCoordinates, std::pair<int, int> direction,
+                             const Board &board) {
+    int toBeCheckedCol = this->currentCol + direction.first;
+    int toBeCheckedRow = this->currentRow + direction.second;
+    bool result;
 
-	while ((toBeCheckedCol >= 0 && toBeCheckedCol <= 7) && (toBeCheckedRow >= 0 && toBeCheckedRow <= 7)) {
-		result = addIfValid(board, validCordinates, { toBeCheckedCol, toBeCheckedRow });
-		toBeCheckedCol += direction.first;
-		toBeCheckedRow += direction.second;
-		if (!result) {
-			return;
-		}
-	}
+    while ((toBeCheckedCol >= 0 && toBeCheckedCol <= 7) && (toBeCheckedRow >= 0 && toBeCheckedRow <= 7)) {
+        result = addIfValid(board, validCoordinates, {toBeCheckedCol, toBeCheckedRow});
+        toBeCheckedCol += direction.first;
+        toBeCheckedRow += direction.second;
+        if (!result) {
+            return;
+        }
+    }
 }
 

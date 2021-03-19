@@ -5,61 +5,48 @@
 
 namespace Chess {
 
-	class Board;
+    class Board;
 
-	enum class Color {
-		White,
-		Black
-	};
+    enum class Color {
+        White,
+        Black
+    };
 
-	enum class MoveResponse {
-		Moved,
-		Failed,
-		Ate
-	};
+    enum class MoveResponse {
+        Moved,
+        Failed,
+        Ate
+    };
 
-	class Piece {
+    class Piece {
 
-	protected:
-		Color color;
-		int currentCol;
-		int currentRow;
-		int numOfSprite;
+    protected:
+        Color color;
+        int currentCol;
+        int currentRow;
+        int numOfSprite;
 
-		Piece(Color color, int currentCol, int currentRow, int numOfSprite);
+        Piece(Color color, int currentCol, int currentRow, int numOfSprite);
 
-		bool addIfValid(const Board& board, std::vector<std::pair<int, int>>& validCordinates, std::pair<int, int>cordinates);
+        bool addIfValid(const Board &board, std::vector<std::pair<int, int>> &validCoordinates,
+                        std::pair<int, int> coordinates);
 
-		MoveResponse checkIfBelongs(std::vector<std::pair<int, int>> validCordinates, std::pair<int, int> inputCordinates, const Board& board);
+        static MoveResponse
+        checkIfBelongs(std::vector<std::pair<int, int>> validCoordinates, std::pair<int, int> inputCoordinates,
+                       const Board &board);
 
-	public:
-		Color getColor() {
-			return color;
-		}
+    public:
+        Color getColor();
 
-		int getCurrentCol() {
-			return currentCol;
-		}
+        int getNumOfSprite() const;
 
-		int getCurrentRow() {
-			return currentRow;
-		}
+        void setCurrentCol(int currentCol);
 
-		int getNumOfSprite() {
-			return numOfSprite;
-		}
+        void setCurrentRow(int currentRow);
 
-		void setCurrentCol(int currentCol) {
-			this->currentCol = currentCol;
-		}
+        virtual MoveResponse checkMove(int newCol, int newRow, const Board &board) = 0;
 
-		void setCurrentRow(int currentRow) {
-			this->currentRow = currentRow;
-		}
-
-		virtual MoveResponse checkMove(int newCol, int newRow, const Board& board) = 0;
-
-	};
+    };
 }
 
 #endif //!PIECE_H
