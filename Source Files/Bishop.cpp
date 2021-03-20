@@ -10,10 +10,7 @@ MoveResponse Bishop::checkMove(int newCol, int newRow, const Board &board) {
     *based on its current coordinates*/
     std::vector<std::pair<int, int>> validCoordinates;
 
-    addSlidingMoves(validCoordinates, {-1, -1}, board);
-    addSlidingMoves(validCoordinates, {+1, +1}, board);
-    addSlidingMoves(validCoordinates, {-1, +1}, board);
-    addSlidingMoves(validCoordinates, {+1, -1}, board);
+    getAllPossibleMoves(validCoordinates, board);
 
     return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }
@@ -32,5 +29,12 @@ void Bishop::addSlidingMoves(std::vector<std::pair<int, int>> &validCoordinates,
             return;
         }
     }
+}
+
+void Bishop::getAllPossibleMoves(std::vector<std::pair<int, int>> &validCoordinates, const Board &board) {
+    addSlidingMoves(validCoordinates, {-1, -1}, board);
+    addSlidingMoves(validCoordinates, {+1, +1}, board);
+    addSlidingMoves(validCoordinates, {-1, +1}, board);
+    addSlidingMoves(validCoordinates, {+1, -1}, board);
 }
 

@@ -3,7 +3,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_SIZE        900
+#define WINDOW_SIZE        600
 
 void windowManager();
 

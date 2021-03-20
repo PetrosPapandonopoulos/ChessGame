@@ -13,10 +13,12 @@ namespace Chess {
                              const Board &board);
 
     public:
-        Bishop(Color color, int currentCol, int currentRow, int numOfSprite) : Piece(color, currentCol, currentRow,
-                                                                                     numOfSprite) {}
+        Bishop(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName) : Piece(color, currentCol, currentRow,
+                                                                                     numOfSprite, pieceName) {}
 
         MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
+
+        void getAllPossibleMoves(std::vector<std::pair<int, int>>& validCoordinates, const Board &board) override;
     };
 
 }

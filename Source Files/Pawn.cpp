@@ -10,6 +10,12 @@ MoveResponse Pawn::checkMove(int newCol, int newRow, const Board &board) {
     *based on its current coordinates*/
     std::vector<std::pair<int, int>> validCoordinates;
 
+    getAllPossibleMoves(validCoordinates, board);
+
+    return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
+}
+
+void Pawn::getAllPossibleMoves(std::vector<std::pair<int, int>>& validCoordinates, const Board &board) {
     /* Based on color a direction value is used to determine the index
     *of the forward tiles below*/
     int direction = this->color == Color::Black ? 1 : -1;
@@ -35,5 +41,4 @@ MoveResponse Pawn::checkMove(int newCol, int newRow, const Board &board) {
         addIfValid(board, validCoordinates, {currentCol + (1 * direction), currentRow - 1});
     }
 
-    return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }

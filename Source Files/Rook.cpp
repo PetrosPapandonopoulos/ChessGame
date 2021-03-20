@@ -11,12 +11,7 @@ MoveResponse Rook::checkMove(int newCol, int newRow, const Board &board) {
 
     std::vector<std::pair<int, int>> validCoordinates;
 
-    //horizontal check
-    addSlidingMoves(validCoordinates, currentCol + 1, 8, 1, board, true);
-    addSlidingMoves(validCoordinates, currentCol - 1, 0, -1, board, true);
-    //vertical check
-    addSlidingMoves(validCoordinates, currentRow + 1, 8, 1, board, false);
-    addSlidingMoves(validCoordinates, currentRow - 1, 0, -1, board, false);
+    getAllPossibleMoves(validCoordinates, board);
 
     return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }
@@ -50,4 +45,11 @@ void Rook::addSlidingMoves(std::vector<std::pair<int, int>> &validCoordinates, i
     }
 }
 
-// todo: extra valid move for rook named "Castling"
+void Rook::getAllPossibleMoves(std::vector<std::pair<int, int>>& validCoordinates, const Board &board){
+    //horizontal check
+    addSlidingMoves(validCoordinates, currentCol + 1, 8, 1, board, true);
+    addSlidingMoves(validCoordinates, currentCol - 1, 0, -1, board, true);
+    //vertical check
+    addSlidingMoves(validCoordinates, currentRow + 1, 8, 1, board, false);
+    addSlidingMoves(validCoordinates, currentRow - 1, 0, -1, board, false);
+}

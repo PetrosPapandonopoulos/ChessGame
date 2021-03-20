@@ -4,8 +4,8 @@
 
 using namespace Chess;
 
-Piece::Piece(Color color, int currentCol, int currentRow, int numOfSprite) :
-        color(color), currentCol(currentCol), currentRow(currentRow), numOfSprite(numOfSprite) {
+Piece::Piece(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName) :
+        color(color), currentCol(currentCol), currentRow(currentRow), numOfSprite(numOfSprite), pieceName(pieceName) {
 }
 
 /* The checkIfValid method is used in all classes children of Piece,
@@ -43,6 +43,10 @@ Piece::checkIfBelongs(std::vector<std::pair<int, int>> validCoordinates, std::pa
 
 Color Piece::getColor() {
     return color;
+}
+
+Type Piece::getPieceName() {
+    return pieceName;
 }
 
 int Piece::getNumOfSprite() const {

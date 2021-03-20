@@ -15,6 +15,7 @@ namespace Chess {
 
         void unMove(int currentCol, int CurrentRow, int newCol, int newRow, std::unique_ptr<Piece> &pieceEaten);
         void unMove(int currentCol, int CurrentRow, int newCol, int newRow);
+        bool checkingForChecks(Color teamColor);
 
     public:
 

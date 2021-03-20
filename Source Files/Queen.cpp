@@ -9,18 +9,7 @@ MoveResponse Queen::checkMove(int newCol, int newRow, const Board &board) {
     *based on its current coordinates*/
     std::vector<std::pair<int, int>> validCoordinates;
 
-    //vertical check
-    addSlidingMovesHorVer(validCoordinates, currentCol + 1, 8, 1, board, true);
-    addSlidingMovesHorVer(validCoordinates, currentCol - 1, 0, -1, board, true);
-    //horizontal check
-    addSlidingMovesHorVer(validCoordinates, currentRow + 1, 8, 1, board, false);
-    addSlidingMovesHorVer(validCoordinates, currentRow - 1, 0, -1, board, false);
-
-    //diagonal check
-    addSlidingMovesDiagonal(validCoordinates, {-1, -1}, board);
-    addSlidingMovesDiagonal(validCoordinates, {+1, +1}, board);
-    addSlidingMovesDiagonal(validCoordinates, {-1, +1}, board);
-    addSlidingMovesDiagonal(validCoordinates, {+1, -1}, board);
+    getAllPossibleMoves(validCoordinates, board);
 
     return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }
@@ -70,4 +59,19 @@ void Queen::addSlidingMovesDiagonal(std::vector<std::pair<int, int>> &validCoord
             return;
         }
     }
+}
+
+void Queen::getAllPossibleMoves(std::vector<std::pair<int, int>>& validCoordinates, const Board &board) {
+    //vertical check
+    addSlidingMovesHorVer(validCoordinates, currentCol + 1, 8, 1, board, true);
+    addSlidingMovesHorVer(validCoordinates, currentCol - 1, 0, -1, board, true);
+    //horizontal check
+    addSlidingMovesHorVer(validCoordinates, currentRow + 1, 8, 1, board, false);
+    addSlidingMovesHorVer(validCoordinates, currentRow - 1, 0, -1, board, false);
+
+    //diagonal check
+    addSlidingMovesDiagonal(validCoordinates, {-1, -1}, board);
+    addSlidingMovesDiagonal(validCoordinates, {+1, +1}, board);
+    addSlidingMovesDiagonal(validCoordinates, {-1, +1}, board);
+    addSlidingMovesDiagonal(validCoordinates, {+1, -1}, board);
 }

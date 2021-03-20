@@ -10,12 +10,7 @@ MoveResponse Horse::checkMove(int newCol, int newRow, const Board &board) {
     *based on its current coordinates*/
     std::vector<std::pair<int, int>> validCoordinates;
 
-    //vertical check
-    addHopMoves(validCoordinates, this->currentCol - 2, board, true);
-    addHopMoves(validCoordinates, this->currentCol + 2, board, true);
-    //horizontal check
-    addHopMoves(validCoordinates, this->currentRow - 2, board, false);
-    addHopMoves(validCoordinates, this->currentRow + 2, board, false);
+    getAllPossibleMoves(validCoordinates, board);
 
     return checkIfBelongs(validCoordinates, {newCol, newRow}, board);
 }
@@ -31,4 +26,13 @@ void Horse::addHopMoves(std::vector<std::pair<int, int>> &validCoordinates, int 
         addIfValid(board, validCoordinates, {this->currentCol + 1, Direction});
         addIfValid(board, validCoordinates, {this->currentCol - 1, Direction});
     }
+}
+
+void Horse::getAllPossibleMoves(std::vector<std::pair<int, int>> &validCoordinates, const Board &board){
+    //vertical check
+    addHopMoves(validCoordinates, this->currentCol - 2, board, true);
+    addHopMoves(validCoordinates, this->currentCol + 2, board, true);
+    //horizontal check
+    addHopMoves(validCoordinates, this->currentRow - 2, board, false);
+    addHopMoves(validCoordinates, this->currentRow + 2, board, false);
 }
