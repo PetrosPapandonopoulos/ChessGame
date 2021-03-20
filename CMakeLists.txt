@@ -9,7 +9,7 @@ set(SFML_DIR "SFML-2.5.1/lib/cmake/SFML")
 
 link_directories(SFML_LIBRARY_DIR)
 include_directories(SFML_INCLUDE_DIR)
-find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
+find_package(SFML 2.5.1 COMPONENTS system window graphics)
 
 if(SFML_FOUND)
     message(STATUS "SFML_INCLUDE_DIR: ${SFML_INCLUDE_DIR}")

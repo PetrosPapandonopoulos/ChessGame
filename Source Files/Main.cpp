@@ -3,7 +3,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_SIZE        600
+#define WINDOW_SIZE        900
 
 void windowManager();
 
@@ -34,6 +34,10 @@ void windowManager() {
     sf::Sprite piecesSprites[32];
     sf::Texture PiecesTextures[12];
     sf::Vector2f tileDim(window.getSize().x / 8.0, window.getSize().y / 8.0);
+    sf::Image icon;
+
+    icon.loadFromFile("Sprites/icon.png");
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 
     loadSprites(piecesSprites, PiecesTextures, tileDim);
