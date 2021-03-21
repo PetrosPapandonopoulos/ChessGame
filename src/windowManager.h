@@ -2,6 +2,7 @@
 #define WINDOWMANAGER_H
 #define MAIN_WINDOW_SIZE        900
 #define CHOICE_WINDOW_SIZE      400
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "Board.h"
@@ -19,7 +20,8 @@ void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim);
 
 void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const Chess::Board &mainBoard);
 
-void drawCheckFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> kingCoordinates, int &alpha);
+void
+drawCheckFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> kingCoordinates, int &alpha);
 
 void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i pieceLastPosition,
                      sf::Vector2f tileDim);
@@ -37,15 +39,15 @@ void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::
                   const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard, Chess::Type ch);
 
 sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
-                         sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition);
+                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition);
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
-                           sf::Sprite *piecesSprites, sf::Texture *piecesTexture, bool &movingAPiece,
-                           sf::Vector2i &pieceLastPosition, bool& canPromote);
+                                   sf::Sprite *piecesSprites, bool &movingAPiece,
+                                   sf::Vector2i &pieceLastPosition, bool &canPromote);
 
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
              sf::Vector2i mousePositionOnBoard);
 
-bool checkForChecks(const Chess::Board& mainBoard, std::pair<int, int>& kingCoordinates);
+bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoordinates);
 
 #endif //WINDOWMANAGER_H

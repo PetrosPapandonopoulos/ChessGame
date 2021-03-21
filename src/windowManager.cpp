@@ -10,11 +10,11 @@ void windowManager() {
     icon.loadFromFile("Sprites/icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true);
     
     loadSprites(piecesSprites, PiecesTextures, tileDim);
     
     windowCycle(window, piecesSprites, PiecesTextures, tileDim);
-    
 }
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
@@ -26,6 +26,8 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
     int alpha = 255;
     bool canPromote = false;
     sf::Vector2<int> mousePositionOnBoard;
+    sf::Clock deltaClock;
+    sf::Time dt = deltaClock.restart();
     
     
     while (window.isOpen()) {
@@ -48,8 +50,7 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             }
             
             if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && movingAPiece) {
-                mousePositionOnBoard = buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, piecesTexture,
-                                                             movingAPiece,
+                mousePositionOnBoard = buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece,
                                                              pieceLastPosition, canPromote);
             }
         }
@@ -63,6 +64,7 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         
         if (checkForChecks(mainBoard, kingCoordinates)) {
             drawCheckFadeEffect(window, tileDim, kingCoordinates, alpha);
+            alpha += -1 * dt.asSeconds();
         }
         else {
             alpha = 255;
@@ -71,6 +73,7 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         drawBoardPieces(window, piecesSprites, mainBoard);
         
         window.display();
+        dt = deltaClock.restart();
     }
     
 }
@@ -204,10 +207,8 @@ drawCheckFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<in
         sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
         squareRed.setFillColor(sf::Color(238, 0, 0, alpha));
         squareRed.setPosition(sf::Vector2f(tileDim.x * kingCoordinates.second, tileDim.y * kingCoordinates.first));
-        alpha--;
         window.draw(squareRed);
     }
-    
 }
 
 void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i pieceLastPosition,
@@ -364,8 +365,8 @@ sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &m
 }
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
-                                   sf::Sprite *piecesSprites, sf::Texture *piecesTexture, bool &movingAPiece,
-                                   sf::Vector2i &pieceLastPosition, bool &canPromote) {
+                                   sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition,
+                                   bool &canPromote) {
     
     movingAPiece = false;
     

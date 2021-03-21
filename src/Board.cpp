@@ -1,12 +1,12 @@
-#include "Board.h"
+#include "Pieces/Bishop.h"
 #include "Pieces/Rook.h"
 #include "Pieces/Pawn.h"
-#include "Pieces/Bishop.h"
 #include "Pieces/King.h"
 #include "Pieces/Queen.h"
 #include "Pieces/Horse.h"
-#include <iostream>
+#include "Board.h"
 #include <algorithm>
+#include <iostream>
 
 using namespace Chess;
 
