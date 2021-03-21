@@ -1,39 +1,4 @@
-#include "Board.h"
-#include <string>
-#include <iostream>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
-#define MAIN_WINDOW_SIZE        900
-#define CHOICE_WINDOW_SIZE      400
-
-void windowManager();
-
-void windowCycle(sf::RenderWindow &, sf::Sprite *, sf::Texture *, sf::Vector2f);
-
-void loadSprites(sf::Sprite *, sf::Texture *, sf::Vector2f);
-
-void drawTiles(sf::RenderWindow &, sf::Vector2f);
-
-void drawBoardPieces(sf::RenderWindow &, sf::Sprite *, const Chess::Board &);
-
-void placeAPieceBack(sf::Sprite *, const Chess::Board &, sf::Vector2i, sf::Vector2f);
-
-void setNewPosition(sf::Sprite *, const Chess::Board &, sf::Vector2i, sf::Vector2i, sf::Vector2f);
-
-bool checkBounds(sf::Vector2i);
-
-bool checkTurn(const Chess::Board &, sf::Vector2i);
-
-Chess::Type getAChoiceWindow(sf::Texture *, Chess::Color);
-
-void changeSprite(sf::Texture *, sf::Sprite *, Chess::Color, const Chess::Board &, sf::Vector2i, Chess::Type);
-
-int main() {
-    
-    windowManager();
-    return 0;
-}
+#include "windowManager.h"
 
 void windowManager() {
     sf::RenderWindow window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WINDOW_SIZE), "Chess game", sf::Style::Close);
@@ -52,12 +17,11 @@ void windowManager() {
     
 }
 
-void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *chessPiecesTexture,
+void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
                  sf::Vector2f tileDim) {
     
     Chess::Board mainBoard;
-    bool MovingAPiece = false;
-    
+    bool movingAPiece = false;
     sf::Vector2i pieceLastPosition;
     
     
@@ -72,61 +36,11 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             }
             
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
-                
-                sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-                sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
-                                                  mousePosition.y / ((int) tileDim.y));
-                
-                if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
-                    if (checkTurn(mainBoard, mousePositionOnBoard)) {
-                        if (!MovingAPiece) {
-                            MovingAPiece = true;
-                            pieceLastPosition = mousePositionOnBoard;
-                        }
-                    }
-                }
-                
-                if (MovingAPiece) {
-                    //drag piece with cursor
-                    int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
-                    float newX = mousePosition.x - tileDim.x / 2;
-                    float newY = mousePosition.y - tileDim.y / 2;
-                    piecesSprites[index].setPosition(newX, newY);
-                }
+                buttonPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece, pieceLastPosition);
             }
-            
-            if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && MovingAPiece) {
-                
-                MovingAPiece = false;
-                
-                sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-                sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
-                                                  mousePosition.y / ((int) tileDim.y));
-                
-                if (checkBounds(mousePositionOnBoard)) {
-                    
-                    if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y,
-                                       mousePositionOnBoard.x)) {
-                        
-                        setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
-                        
-                        Chess::Color result = mainBoard.checkForPromotion();
-                        
-                        if (result == Chess::Color::Black || result == Chess::Color::White) {
-                            Chess::Type ch = getAChoiceWindow(chessPiecesTexture, result);
-                            changeSprite(chessPiecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard, ch);
-                            mainBoard.promote({mousePositionOnBoard.y, mousePositionOnBoard.x}, ch);
-                        }
-                        
-                        mainBoard.nextTurn();
-                    }
-                    else {
-                        placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
-                    }
-                }
-                else {
-                    placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
-                }
+            if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && movingAPiece) {
+                buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, piecesTexture, movingAPiece,
+                                      pieceLastPosition);
             }
         }
         
@@ -141,51 +55,51 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
     
 }
 
-void loadSprites(sf::Sprite *piecesSprites, sf::Texture *chessPiecesTexture, sf::Vector2f tileDim) {
+void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vector2f tileDim) {
     
     //load textures
     for (int i = 0; i < 12; i++) {
-        chessPiecesTexture[i].loadFromFile("Sprites/tile" + std::to_string(i) + ".png");
-        chessPiecesTexture[i].setSmooth(true);
+        piecesTexture[i].loadFromFile("Sprites/tile" + std::to_string(i) + ".png");
+        piecesTexture[i].setSmooth(true);
     }
     
     //black pieces
     
     //rook
-    piecesSprites[0].setTexture(chessPiecesTexture[0]);
+    piecesSprites[0].setTexture(piecesTexture[0]);
     piecesSprites[0].setPosition(sf::Vector2f(tileDim.x * 0, 0.f));
     
     //horse
-    piecesSprites[1].setTexture(chessPiecesTexture[1]);
+    piecesSprites[1].setTexture(piecesTexture[1]);
     piecesSprites[1].setPosition(sf::Vector2f(tileDim.x * 1, 0.f));
     
     //bishop
-    piecesSprites[2].setTexture(chessPiecesTexture[2]);
+    piecesSprites[2].setTexture(piecesTexture[2]);
     piecesSprites[2].setPosition(sf::Vector2f(tileDim.x * 2, 0.f));
     
     //queen
-    piecesSprites[3].setTexture(chessPiecesTexture[3]);
+    piecesSprites[3].setTexture(piecesTexture[3]);
     piecesSprites[3].setPosition(sf::Vector2f(tileDim.x * 3, 0.f));
     
     //king
-    piecesSprites[4].setTexture(chessPiecesTexture[4]);
+    piecesSprites[4].setTexture(piecesTexture[4]);
     piecesSprites[4].setPosition(sf::Vector2f(tileDim.x * 4, 0.f));
     
     //bishop
-    piecesSprites[5].setTexture(chessPiecesTexture[2]);
+    piecesSprites[5].setTexture(piecesTexture[2]);
     piecesSprites[5].setPosition(sf::Vector2f(tileDim.x * 5, 0.f));
     
     //horse
-    piecesSprites[6].setTexture(chessPiecesTexture[1]);
+    piecesSprites[6].setTexture(piecesTexture[1]);
     piecesSprites[6].setPosition(sf::Vector2f(tileDim.x * 6, 0.f));
     
     //rook
-    piecesSprites[7].setTexture(chessPiecesTexture[0]);
+    piecesSprites[7].setTexture(piecesTexture[0]);
     piecesSprites[7].setPosition(sf::Vector2f(tileDim.x * 7, 0.f));
     
     //pawns
     for (int i = 0; i < 8; i++) {
-        piecesSprites[8 + i].setTexture(chessPiecesTexture[5]);
+        piecesSprites[8 + i].setTexture(piecesTexture[5]);
         piecesSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * (float) i, tileDim.y));
     }
     
@@ -193,40 +107,40 @@ void loadSprites(sf::Sprite *piecesSprites, sf::Texture *chessPiecesTexture, sf:
     //white pieces
     
     //rook
-    piecesSprites[16].setTexture(chessPiecesTexture[6]);
+    piecesSprites[16].setTexture(piecesTexture[6]);
     piecesSprites[16].setPosition(sf::Vector2f(tileDim.x * 0, tileDim.y * 7));
     
     //horse
-    piecesSprites[17].setTexture(chessPiecesTexture[7]);
+    piecesSprites[17].setTexture(piecesTexture[7]);
     piecesSprites[17].setPosition(sf::Vector2f(tileDim.x * 1, tileDim.y * 7));
     
     //bishop
-    piecesSprites[18].setTexture(chessPiecesTexture[8]);
+    piecesSprites[18].setTexture(piecesTexture[8]);
     piecesSprites[18].setPosition(sf::Vector2f(tileDim.x * 2, tileDim.y * 7));
     
     //queen
-    piecesSprites[19].setTexture(chessPiecesTexture[9]);
+    piecesSprites[19].setTexture(piecesTexture[9]);
     piecesSprites[19].setPosition(sf::Vector2f(tileDim.x * 3, tileDim.y * 7));
     
     //king
-    piecesSprites[20].setTexture(chessPiecesTexture[10]);
+    piecesSprites[20].setTexture(piecesTexture[10]);
     piecesSprites[20].setPosition(sf::Vector2f(tileDim.x * 4, tileDim.y * 7));
     
     //bishop
-    piecesSprites[21].setTexture(chessPiecesTexture[8]);
+    piecesSprites[21].setTexture(piecesTexture[8]);
     piecesSprites[21].setPosition(sf::Vector2f(tileDim.x * 5, tileDim.y * 7));
     
     //horse
-    piecesSprites[22].setTexture(chessPiecesTexture[7]);
+    piecesSprites[22].setTexture(piecesTexture[7]);
     piecesSprites[22].setPosition(sf::Vector2f(tileDim.x * 6, tileDim.y * 7));
     
     //rook
-    piecesSprites[23].setTexture(chessPiecesTexture[6]);
+    piecesSprites[23].setTexture(piecesTexture[6]);
     piecesSprites[23].setPosition(sf::Vector2f(tileDim.x * 7, tileDim.y * 7));
     
     //pawns
     for (int i = 0; i < 8; i++) {
-        piecesSprites[24 + i].setTexture(chessPiecesTexture[11]);
+        piecesSprites[24 + i].setTexture(piecesTexture[11]);
         piecesSprites[24 + i].setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * 6));
     }
     
@@ -362,7 +276,7 @@ Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
     return Chess::Type::Queen;
 }
 
-void changeSprite(sf::Texture *chessPiecesTexture, sf::Sprite *piecesSprites, Chess::Color result,
+void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Color result,
                   const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard, Chess::Type ch) {
     
     int index = mainBoard.getNumOfSprite(mousePositionOnBoard.y, mousePositionOnBoard.x);
@@ -370,23 +284,85 @@ void changeSprite(sf::Texture *chessPiecesTexture, sf::Sprite *piecesSprites, Ch
     
     switch (ch) {
         case Chess::Type::Rook: {
-            piecesSprites[index].setTexture(chessPiecesTexture[0 + colorIndex]);
+            piecesSprites[index].setTexture(piecesTexture[0 + colorIndex]);
             break;
         }
         case Chess::Type::Horse: {
-            piecesSprites[index].setTexture(chessPiecesTexture[1 + colorIndex]);
+            piecesSprites[index].setTexture(piecesTexture[1 + colorIndex]);
             break;
         }
         case Chess::Type::Bishop: {
-            piecesSprites[index].setTexture(chessPiecesTexture[2 + colorIndex]);
+            piecesSprites[index].setTexture(piecesTexture[2 + colorIndex]);
             break;
         }
         case Chess::Type::Queen: {
-            piecesSprites[index].setTexture(chessPiecesTexture[3 + colorIndex]);
+            piecesSprites[index].setTexture(piecesTexture[3 + colorIndex]);
             break;
         }
         default: {
         
         }
+    }
+}
+
+void buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
+                         sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition) {
+    
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
+                                      mousePosition.y / ((int) tileDim.y));
+    
+    if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
+        if (checkTurn(mainBoard, mousePositionOnBoard)) {
+            if (!movingAPiece) {
+                movingAPiece = true;
+                pieceLastPosition = mousePositionOnBoard;
+            }
+        }
+    }
+    
+    if (movingAPiece) {
+        //drag piece with cursor
+        int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
+        float newX = mousePosition.x - tileDim.x / 2;
+        float newY = mousePosition.y - tileDim.y / 2;
+        piecesSprites[index].setPosition(newX, newY);
+    }
+}
+
+void buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
+                           sf::Sprite *piecesSprites, sf::Texture *piecesTexture, bool &movingAPiece,
+                           sf::Vector2i &pieceLastPosition) {
+    
+    movingAPiece = false;
+    
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
+                                      mousePosition.y / ((int) tileDim.y));
+    
+    if (checkBounds(mousePositionOnBoard)) {
+        
+        if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y,
+                           mousePositionOnBoard.x)) {
+            
+            setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
+            
+            Chess::Color result = mainBoard.checkForPromotion();
+            
+            if (result == Chess::Color::Black || result == Chess::Color::White) {
+                Chess::Type ch = getAChoiceWindow(piecesTexture, result);
+                changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
+                             ch);
+                mainBoard.promote({mousePositionOnBoard.y, mousePositionOnBoard.x}, ch);
+            }
+            
+            mainBoard.nextTurn();
+        }
+        else {
+            placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
+        }
+    }
+    else {
+        placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
     }
 }
