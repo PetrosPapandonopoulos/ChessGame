@@ -66,7 +66,7 @@ bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
     if (board[currentCol][currentRow] != nullptr) {
         
         MoveResponse result = board[currentCol][currentRow]->checkMove(newCol, newRow, *this);
-        
+        std::pair<int, int> kingCoordinates;
         if (result == MoveResponse::Ate) {
             std::unique_ptr<Piece> pieceEaten = std::move(this->board[newCol][newRow]);
             
@@ -77,7 +77,7 @@ bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
             
             //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
-            if (checkingForChecks(enemyColor)) {
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
                 this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
                 return false;
             }
@@ -93,7 +93,7 @@ bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
             
             //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
-            if (checkingForChecks(enemyColor)) {
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
                 this->unMove(currentCol, currentRow, newCol, newRow);
                 return false;
             }
@@ -118,10 +118,9 @@ void Board::unMove(int currentCol, int currentRow, int newCol, int newRow) {
     this->board[newCol][newRow] = nullptr;
 }
 
-bool Board::checkingForChecks(Color teamColor) {
+bool Board::checkingForChecks(Color teamColor, std::pair<int, int>& kingCoordinates) const{
     
     std::vector<std::pair<int, int>> validCoordinates;
-    std::pair<int, int> kingCoordinates;
     
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {

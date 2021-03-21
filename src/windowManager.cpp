@@ -23,18 +23,14 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
     Chess::Board mainBoard;
     bool movingAPiece = false;
     sf::Vector2i pieceLastPosition;
-    
-    sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
-    squareRed.setPosition(sf::Vector2f(tileDim.x * 4, tileDim.y * 7));
-    int a = 255;
+    int alpha = 255;
+    bool canPromote = false;
+    sf::Vector2<int> mousePositionOnBoard;
     
     
     while (window.isOpen()) {
         
         sf::Event event{};
-        if (a<0){a=255;}
-        squareRed.setFillColor(sf::Color(238, 0, 0, a));
-        a--;
         
         while (window.pollEvent(event)) {
             
@@ -42,12 +38,19 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
                 window.close();
             }
             
+            if (canPromote) {
+                promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard);
+                canPromote = false;
+            }
+            
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
                 buttonPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece, pieceLastPosition);
             }
+            
             if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && movingAPiece) {
-                buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, piecesTexture, movingAPiece,
-                                      pieceLastPosition);
+                mousePositionOnBoard = buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, piecesTexture,
+                                                             movingAPiece,
+                                                             pieceLastPosition, canPromote);
             }
         }
         
@@ -55,7 +58,15 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         
         drawTiles(window, tileDim);
         
-        window.draw(squareRed);
+        
+        std::pair<int, int> kingCoordinates;
+        
+        if (checkForChecks(mainBoard, kingCoordinates)) {
+            drawCheckFadeEffect(window, tileDim, kingCoordinates, alpha);
+        }
+        else {
+            alpha = 255;
+        }
         
         drawBoardPieces(window, piecesSprites, mainBoard);
         
@@ -187,6 +198,18 @@ void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const 
     }
 }
 
+void
+drawCheckFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> kingCoordinates, int &alpha) {
+    if (alpha >= 0) {
+        sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
+        squareRed.setFillColor(sf::Color(238, 0, 0, alpha));
+        squareRed.setPosition(sf::Vector2f(tileDim.x * kingCoordinates.second, tileDim.y * kingCoordinates.first));
+        alpha--;
+        window.draw(squareRed);
+    }
+    
+}
+
 void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i pieceLastPosition,
                      sf::Vector2f tileDim) {
     int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
@@ -314,8 +337,8 @@ void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::
     }
 }
 
-void buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
-                         sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition) {
+sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
+                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition) {
     
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
@@ -337,11 +360,12 @@ void buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard
         float newY = mousePosition.y - tileDim.y / 2;
         piecesSprites[index].setPosition(newX, newY);
     }
+    return mousePositionOnBoard;
 }
 
-void buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
-                           sf::Sprite *piecesSprites, sf::Texture *piecesTexture, bool &movingAPiece,
-                           sf::Vector2i &pieceLastPosition) {
+sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
+                                   sf::Sprite *piecesSprites, sf::Texture *piecesTexture, bool &movingAPiece,
+                                   sf::Vector2i &pieceLastPosition, bool &canPromote) {
     
     movingAPiece = false;
     
@@ -359,15 +383,7 @@ void buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf
             Chess::Color result = mainBoard.checkForPromotion();
             
             if (result == Chess::Color::Black || result == Chess::Color::White) {
-                
-                Chess::Type ch = getAChoiceWindow(piecesTexture, result);
-                
-                changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
-                             ch);
-                
-                int col = mousePositionOnBoard.y;
-                int row = mousePositionOnBoard.x;
-                mainBoard.promote({col, row}, ch);
+                canPromote = true;
             }
             
             mainBoard.nextTurn();
@@ -379,4 +395,23 @@ void buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf
     else {
         placeAPieceBack(piecesSprites, mainBoard, pieceLastPosition, tileDim);
     }
+    return mousePositionOnBoard;
+}
+
+
+void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
+             sf::Vector2i mousePositionOnBoard) {
+    Chess::Type ch = getAChoiceWindow(piecesTexture, result);
+    
+    changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
+                 ch);
+    
+    int col = mousePositionOnBoard.y;
+    int row = mousePositionOnBoard.x;
+    mainBoard.promote({col, row}, ch);
+}
+
+bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoordinates) {
+    return mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates) ||
+           mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates);
 }
