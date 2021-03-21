@@ -9,7 +9,7 @@ void windowManager() {
     
     icon.loadFromFile("Sprites/icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    
+    window.setFramerateLimit(60);
     
     loadSprites(piecesSprites, PiecesTextures, tileDim);
     
@@ -24,10 +24,17 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
     bool movingAPiece = false;
     sf::Vector2i pieceLastPosition;
     
+    sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
+    squareRed.setPosition(sf::Vector2f(tileDim.x * 4, tileDim.y * 7));
+    int a = 255;
+    
     
     while (window.isOpen()) {
         
         sf::Event event{};
+        if (a<0){a=255;}
+        squareRed.setFillColor(sf::Color(238, 0, 0, a));
+        a--;
         
         while (window.pollEvent(event)) {
             
@@ -47,6 +54,8 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         window.clear(sf::Color::Black);
         
         drawTiles(window, tileDim);
+        
+        window.draw(squareRed);
         
         drawBoardPieces(window, piecesSprites, mainBoard);
         
@@ -350,10 +359,15 @@ void buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf
             Chess::Color result = mainBoard.checkForPromotion();
             
             if (result == Chess::Color::Black || result == Chess::Color::White) {
+                
                 Chess::Type ch = getAChoiceWindow(piecesTexture, result);
+                
                 changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
                              ch);
-                mainBoard.promote({mousePositionOnBoard.y, mousePositionOnBoard.x}, ch);
+                
+                int col = mousePositionOnBoard.y;
+                int row = mousePositionOnBoard.x;
+                mainBoard.promote({col, row}, ch);
             }
             
             mainBoard.nextTurn();
