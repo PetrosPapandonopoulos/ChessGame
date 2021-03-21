@@ -1,10 +1,10 @@
 #include "Board.h"
-#include "Rook.h"
-#include "Pawn.h"
-#include "Bishop.h"
-#include "King.h"
-#include "Queen.h"
-#include "Horse.h"
+#include "Pieces/Rook.h"
+#include "Pieces/Pawn.h"
+#include "Pieces/Bishop.h"
+#include "Pieces/King.h"
+#include "Pieces/Queen.h"
+#include "Pieces/Horse.h"
 #include <iostream>
 #include <algorithm>
 

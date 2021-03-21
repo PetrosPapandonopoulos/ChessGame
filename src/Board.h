@@ -2,7 +2,7 @@
 #define BOARD_H
 #define BOARD_SIZE    8
 
-#include "Piece.h"
+#include "Pieces/Piece.h"
 #include <memory>
 
 namespace Chess {

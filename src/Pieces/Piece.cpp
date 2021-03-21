@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "Piece.h"
-#include "Board.h"
+#include "../Board.h"
 
 using namespace Chess;
 

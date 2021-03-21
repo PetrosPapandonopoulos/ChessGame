@@ -1,4 +1,4 @@
-#include "Board.h"
+#include "../Board.h"
 #include "Pawn.h"
 #include <vector>
 
