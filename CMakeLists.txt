@@ -18,22 +18,22 @@ if(SFML_FOUND)
 endif()
 
 add_executable(ChessGame
-        "Source Files/Bishop.cpp"
-        "Source Files/Bishop.h"
-        "Source Files/Board.cpp"
-        "Source Files/Board.h"
-        "Source Files/Horse.cpp"
-        "Source Files/Horse.h"
-        "Source Files/King.cpp"
-        "Source Files/King.h"
-        "Source Files/Main.cpp"
-        "Source Files/Pawn.cpp"
-        "Source Files/Pawn.h"
-        "Source Files/Piece.cpp"
-        "Source Files/Piece.h"
-        "Source Files/Queen.cpp"
-        "Source Files/Queen.h"
-        "Source Files/Rook.cpp"
-        "Source Files/Rook.h")
+        "src/Bishop.cpp"
+        "src/Bishop.h"
+        "src/Board.cpp"
+        "src/Board.h"
+        "src/Horse.cpp"
+        "src/Horse.h"
+        "src/King.cpp"
+        "src/King.h"
+        "src/Main.cpp"
+        "src/Pawn.cpp"
+        "src/Pawn.h"
+        "src/Piece.cpp"
+        "src/Piece.h"
+        "src/Queen.cpp"
+        "src/Queen.h"
+        "src/Rook.cpp"
+        "src/Rook.h")
 
 target_link_libraries(ChessGame sfml-graphics sfml-window sfml-system)
