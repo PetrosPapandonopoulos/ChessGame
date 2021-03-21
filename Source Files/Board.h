@@ -32,6 +32,10 @@ namespace Chess {
         Color getWhoseTurn() const;
 
         void nextTurn();
+    
+        Color checkForPromotion();
+        
+        bool promote(std::pair<int, int> pieceCoordinates, Type promoteTo);
     };
 }
 

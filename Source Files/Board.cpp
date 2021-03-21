@@ -5,13 +5,14 @@
 #include "King.h"
 #include "Queen.h"
 #include "Horse.h"
+#include <iostream>
 #include <algorithm>
 
 using namespace Chess;
 
 Board::Board() {
     //Black pieces
-
+    
     //Rook
     board[0][0] = std::move(std::unique_ptr<Piece>(new Rook(Color::Black, 0, 0, 0, Type::Rook)));
     //Horse
@@ -28,14 +29,14 @@ Board::Board() {
     board[0][6] = std::move(std::unique_ptr<Piece>(new Horse(Color::Black, 0, 6, 6, Type::Horse)));
     //Rook 2
     board[0][7] = std::move(std::unique_ptr<Piece>(new Rook(Color::Black, 0, 7, 7, Type::Rook)));
-
+    
     //Pawns
     for (int i = 0; i < 8; i++) {
         board[1][i] = std::move(std::unique_ptr<Piece>(new Pawn(Color::Black, 1, i, i + 8, Type::Pawn)));
     }
-
+    
     //Black pieces
-
+    
     //Rook
     board[7][0] = std::move(std::unique_ptr<Piece>(new Rook(Color::White, 7, 0, 16, Type::Rook)));
     //Horse
@@ -52,47 +53,51 @@ Board::Board() {
     board[7][6] = std::move(std::unique_ptr<Piece>(new Horse(Color::White, 7, 6, 22, Type::Horse)));
     //Rook 2
     board[7][7] = std::move(std::unique_ptr<Piece>(new Rook(Color::White, 7, 7, 23, Type::Rook)));
-
+    
     for (int i = 0; i < 8; i++) {
         board[6][i] = std::move(std::unique_ptr<Piece>(new Pawn(Color::White, 6, i, i + 24, Type::Pawn)));
     }
-
+    
     turnFor = Color::White;
 }
 
 bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
-
+    
     if (board[currentCol][currentRow] != nullptr) {
-
+        
         MoveResponse result = board[currentCol][currentRow]->checkMove(newCol, newRow, *this);
-
+        
         if (result == MoveResponse::Ate) {
             std::unique_ptr<Piece> pieceEaten = std::move(this->board[newCol][newRow]);
-
+            
             this->board[newCol][newRow] = std::move(this->board[currentCol][currentRow]);
             board[currentCol][currentRow] = nullptr;
             board[newCol][newRow]->setCurrentCol(newCol);
             board[newCol][newRow]->setCurrentRow(newRow);
-
+            
             //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
             if (checkingForChecks(enemyColor)) {
                 this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
                 return false;
             }
+            
+            
             return true;
-        } else if (result == MoveResponse::Moved) {
+        }
+        else if (result == MoveResponse::Moved) {
             this->board[newCol][newRow] = std::move(this->board[currentCol][currentRow]);
             this->board[currentCol][currentRow] = nullptr;
             this->board[newCol][newRow]->setCurrentCol(newCol);
             this->board[newCol][newRow]->setCurrentRow(newRow);
-
+            
             //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
             if (checkingForChecks(enemyColor)) {
                 this->unMove(currentCol, currentRow, newCol, newRow);
                 return false;
             }
+            
             return true;
         }
     }
@@ -114,10 +119,10 @@ void Board::unMove(int currentCol, int currentRow, int newCol, int newRow) {
 }
 
 bool Board::checkingForChecks(Color teamColor) {
-
+    
     std::vector<std::pair<int, int>> validCoordinates;
     std::pair<int, int> kingCoordinates;
-
+    
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
             if (board[i][j] != nullptr) {
@@ -126,18 +131,20 @@ bool Board::checkingForChecks(Color teamColor) {
                         kingCoordinates.first = i;
                         kingCoordinates.second = j;
                     }
-                } else {
+                }
+                else {
                     board[i][j]->getAllPossibleMoves(validCoordinates, *this);
                 }
             }
         }
     }
-
+    
     auto it = std::find(validCoordinates.begin(), validCoordinates.end(), kingCoordinates);
-
+    
     if (it != validCoordinates.end()) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -160,5 +167,57 @@ Color Board::getWhoseTurn() const {
 
 void Board::nextTurn() {
     turnFor = turnFor == Color::White ? Color::Black : Color::White;
+}
+
+Color Board::checkForPromotion(){
+    for(int i = 0; i < BOARD_SIZE; i++){
+        if (!isEmpty(0, i)){
+            if(board[0][i]->getPieceName() == Type::Pawn){
+                return Color::White;
+            }
+        }
+        if(!isEmpty(7, i)){
+            if(board[7][i]->getPieceName() == Type::Pawn){
+                return Color::Black;
+            }
+        }
+    }
+    return Color::None;
+}
+
+bool Board::promote(std::pair<int, int> pieceCoordinates, Type promoteTo) {
+    if (board[pieceCoordinates.first][pieceCoordinates.second]->getPieceName() == Type::Pawn){
+        int col = pieceCoordinates.first;
+        int row = pieceCoordinates.second;
+        Color newColor = getColor(col, row);
+        int newNumOfSprite = getNumOfSprite(col, row);
+        
+        switch (promoteTo) {
+            case Type::Rook: {
+                board[col][row] = std::move(std::unique_ptr<Piece>(new Rook(newColor, col, row, newNumOfSprite, Type::Rook)));
+                break;
+            }
+            case Type::Horse: {
+                board[col][row] = std::move(std::unique_ptr<Piece>(new Horse(newColor, col, row, newNumOfSprite, Type::Horse)));
+                break;
+            }
+            case Type::Bishop: {
+                board[col][row] = std::move(std::unique_ptr<Piece>(new Bishop(newColor, col, row, newNumOfSprite, Type::Bishop)));
+                break;
+            }
+            case Type::Queen: {
+                board[col][row] = std::move(std::unique_ptr<Piece>(new Queen(newColor, col, row, newNumOfSprite, Type::Queen)));
+                break;
+            }
+            default:{
+            
+            }
+        }
+        return true;
+    }
+    else{
+        std::cout << "Error" << std::endl;
+        return false;
+    }
 }
 

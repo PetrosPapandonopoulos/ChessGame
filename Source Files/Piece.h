@@ -9,7 +9,8 @@ namespace Chess {
 
     enum class Color {
         White,
-        Black
+        Black,
+        None
     };
 
     enum class MoveResponse {
