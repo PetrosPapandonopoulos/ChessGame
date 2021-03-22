@@ -4,30 +4,35 @@ void windowManager() {
     sf::RenderWindow window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WINDOW_SIZE), "Chess game", sf::Style::Close);
     sf::Sprite piecesSprites[32];
     sf::Texture PiecesTextures[12];
+    sf::Text cordTipsSprites[16];
     sf::Vector2f tileDim(window.getSize().x / 8.0, window.getSize().y / 8.0);
     sf::Image icon;
+    sf::Font font;
     
+    
+    font.loadFromFile("Resources/RobotoMono-Regular.ttf");
     icon.loadFromFile("Sprites/icon.png");
+    
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
     
     loadSprites(piecesSprites, PiecesTextures, tileDim);
+    loadCordTips(cordTipsSprites, tileDim, font);
     
-    windowCycle(window, piecesSprites, PiecesTextures, tileDim);
+    windowCycle(window, piecesSprites, PiecesTextures, tileDim, cordTipsSprites);
 }
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
-                 sf::Vector2f tileDim) {
+                 sf::Vector2f tileDim, sf::Text *cordTipsSprites) {
     
     Chess::Board mainBoard;
-    bool movingAPiece = false;
-    sf::Vector2i pieceLastPosition;
-    int alpha = 255;
-    bool canPromote = false;
-    sf::Vector2<int> mousePositionOnBoard;
     sf::Clock deltaClock;
     sf::Time dt = deltaClock.restart();
+    sf::Vector2i pieceLastPosition;
+    sf::Vector2<int> mousePositionOnBoard;
+    int fadeTransparency = 255;
+    bool canPromote = false;
+    bool movingAPiece = false;
     
     
     while (window.isOpen()) {
@@ -40,11 +45,6 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
                 window.close();
             }
             
-            if (canPromote) {
-                promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard);
-                canPromote = false;
-            }
-            
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
                 buttonPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece, pieceLastPosition);
             }
@@ -55,27 +55,32 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             }
         }
         
-        window.clear(sf::Color::Black);
+        renderFrame(window, mainBoard, tileDim, piecesSprites, cordTipsSprites, fadeTransparency, dt);
         
-        drawTiles(window, tileDim);
-        
-        
-        std::pair<int, int> kingCoordinates;
-        
-        if (checkForChecks(mainBoard, kingCoordinates)) {
-            drawCheckFadeEffect(window, tileDim, kingCoordinates, alpha);
-            alpha += -1 * dt.asSeconds();
-        }
-        else {
-            alpha = 255;
+        if (canPromote) {
+            promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard);
+            canPromote = false;
         }
         
-        drawBoardPieces(window, piecesSprites, mainBoard);
-        
-        window.display();
         dt = deltaClock.restart();
     }
     
+}
+
+void
+renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Sprite *piecesSprites,
+            sf::Text *cordTipsSprites, int &fadeTransparency, sf::Time dt) {
+    window.clear(sf::Color::Black);
+    
+    drawTiles(window, tileDim);
+    
+    drawCordTips(window, cordTipsSprites);
+    
+    checkAndDrawFadeEffect(window, mainBoard, tileDim, dt, fadeTransparency);
+    
+    drawBoardPieces(window, piecesSprites, mainBoard);
+    
+    window.display();
 }
 
 void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vector2f tileDim) {
@@ -177,13 +182,13 @@ void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim) {
     
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
             if (i % 2 == j % 2) {
-                square.setFillColor(sf::Color(238, 238, 213));
+                square.setFillColor(BOARD_WHITE);
             }
             else {
-                square.setFillColor(sf::Color(148, 118, 93));
+                square.setFillColor(BOARD_BLACK);
             }
             square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
             window.draw(square);
@@ -191,9 +196,47 @@ void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim) {
     }
 }
 
-void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const Chess::Board &mainBoard) {
+void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font) {
+    
+    cordTipsSprites[8].setString('a');
+    cordTipsSprites[9].setString('b');
+    cordTipsSprites[10].setString('c');
+    cordTipsSprites[11].setString('d');
+    cordTipsSprites[12].setString('e');
+    cordTipsSprites[13].setString('f');
+    cordTipsSprites[14].setString('g');
+    cordTipsSprites[15].setString('h');
+    
+    
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
+        cordTipsSprites[7 - i].setFont(font);
+        cordTipsSprites[8 + i].setFont(font);
+        cordTipsSprites[7 - i].setString(std::to_string(8 - i));
+        cordTipsSprites[7 - i].setCharacterSize(FONT_SIZE);
+        cordTipsSprites[8 + i].setCharacterSize(FONT_SIZE);
+        if (i % 2 == 0) {
+            cordTipsSprites[7 - i].setFillColor(BOARD_BLACK);
+            cordTipsSprites[8 + i].setFillColor(BOARD_WHITE);
+        }
+        else {
+            cordTipsSprites[7 - i].setFillColor(BOARD_WHITE);
+            cordTipsSprites[8 + i].setFillColor(BOARD_BLACK);
+        }
+        cordTipsSprites[7 - i].setPosition(sf::Vector2f(FONT_POS, tileDim.y * i));
+        cordTipsSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * i + (tileDim.x - FONT_LETTERS_X),
+                                                        tileDim.y * 7 + (tileDim.y - FONT_LETTERS_Y)));
+    }
+}
+
+void drawCordTips(sf::RenderWindow &window, sf::Text *cordTipsSprites) {
+    for (int i = 0; i < 16; i++) {
+        window.draw(cordTipsSprites[i]);
+    }
+}
+
+void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const Chess::Board &mainBoard) {
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
             if (!mainBoard.isEmpty(i, j)) {
                 window.draw(piecesSprites[mainBoard.getNumOfSprite(i, j)]);
             }
@@ -202,25 +245,44 @@ void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const 
 }
 
 void
-drawCheckFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> kingCoordinates, int &alpha) {
-    if (alpha >= 0) {
+drawFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> kingCoordinates,
+               int &fadeTransparency) {
+    
+    if (fadeTransparency >= 0) {
         sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
-        squareRed.setFillColor(sf::Color(238, 0, 0, alpha));
+        squareRed.setFillColor(sf::Color(238, 0, 0, fadeTransparency));
         squareRed.setPosition(sf::Vector2f(tileDim.x * kingCoordinates.second, tileDim.y * kingCoordinates.first));
         window.draw(squareRed);
+    }
+}
+
+void checkAndDrawFadeEffect(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Time dt,
+                            int &fadeTransparency) {
+    
+    std::pair<int, int> kingCoordinates;
+    
+    if (checkForChecks(mainBoard, kingCoordinates)) {
+        drawFadeEffect(window, tileDim, kingCoordinates, fadeTransparency);
+        fadeTransparency += -1 * dt.asSeconds();
+    }
+    else {
+        fadeTransparency = 255;
     }
 }
 
 void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i pieceLastPosition,
                      sf::Vector2f tileDim) {
     int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
+    
     float newX = pieceLastPosition.x * tileDim.x;
     float newY = pieceLastPosition.y * tileDim.y;
+    
     piecesSprites[index].setPosition(newX, newY);
 }
 
 void setNewPosition(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard,
                     sf::Vector2i mousePosition, sf::Vector2f tileDim) {
+    
     int index = mainBoard.getNumOfSprite(mousePositionOnBoard.y, mousePositionOnBoard.x);
     float newX = (mousePosition.x / ((int) tileDim.x)) * tileDim.x;
     float newY = (mousePosition.y / ((int) tileDim.y)) * tileDim.y;
@@ -237,12 +299,16 @@ bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard)
 }
 
 Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
-    sf::RenderWindow window(sf::VideoMode(CHOICE_WINDOW_SIZE, 112), "Choose a Piece", sf::Style::Close);
-    sf::Vector2f tileDim(window.getSize().x / 4.0, window.getSize().y);
+    
+    sf::RenderWindow window(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
+                            "Choose a Piece", sf::Style::Titlebar);
+    
+    sf::Vector2f tileDim(window.getSize().y, window.getSize().y);
     sf::Sprite piecesSprites[4];
     sf::Image icon;
     icon.loadFromFile("Sprites/icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     
     if (color == Chess::Color::Black) {
         for (int i = 0; i < 4; i++) {
@@ -257,11 +323,21 @@ Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
         }
     }
     
+    for (auto &piecesSprite : piecesSprites) {
+        piecesSprite.setScale(sf::Vector2f(tileDim.x / piecesSprite.getLocalBounds().width,
+                                           tileDim.y / piecesSprite.getLocalBounds().height));
+    }
+    
     while (window.isOpen()) {
         
         sf::Event event{};
         
         while (window.pollEvent(event)) {
+            
+            if (event.type == sf::Event::Closed) {
+            }
+            
+            
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
                 sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
                 sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
@@ -293,14 +369,22 @@ Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
         }
         
         if (color == Chess::Color::Black) {
-            window.clear(sf::Color(238, 238, 213));
+            window.clear(BOARD_WHITE);
         }
         else {
-            window.clear(sf::Color(148, 118, 93));
+            window.clear(BOARD_BLACK);
         }
         
-        for (const auto &piecesSprite : piecesSprites) {
-            window.draw(piecesSprite);
+        for (int i = 0; i < 4; i++) {
+            if (i % 2 == 0) {
+                square.setFillColor(BOARD_WHITE);
+            }
+            else {
+                square.setFillColor(BOARD_BLACK);
+            }
+            square.setPosition(sf::Vector2f(tileDim.x * i, 0.f));
+            window.draw(square);
+            window.draw(piecesSprites[i]);
         }
         
         window.display();
@@ -333,7 +417,7 @@ void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::
             break;
         }
         default: {
-        
+            
         }
     }
 }
@@ -399,9 +483,9 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
     return mousePositionOnBoard;
 }
 
-
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
              sf::Vector2i mousePositionOnBoard) {
+    
     Chess::Type ch = getAChoiceWindow(piecesTexture, result);
     
     changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
