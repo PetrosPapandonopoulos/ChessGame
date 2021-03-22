@@ -22,15 +22,17 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
 
 void
 renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Sprite *piecesSprites,
-            sf::Text *cordTipsSprites,  int &fadeTransparency, sf::Time dt);
+            sf::Text *cordTipsSprites, int &fadeTransparency, sf::Time dt, bool someoneLost);
 
 void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vector2f tileDim);
 
-void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim,  const sf::Font& font);
+void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font);
 
 void drawCordTips(sf::RenderWindow &window, sf::Text *cordTipsSprites);
 
-void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int>dimOnWindow);
+void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> dimOnWindow);
+
+void drawATileRed(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> tileCoordinates);
 
 void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const Chess::Board &mainBoard);
 
@@ -40,6 +42,8 @@ drawFadeEffect(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, in
 
 void checkAndDrawFadeEffect(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Time dt,
                             int &fadeTransparency);
+
+void findAndIndicateKing(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim);
 
 void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i pieceLastPosition,
                      sf::Vector2f tileDim);
@@ -57,7 +61,8 @@ void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::
                   const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard, Chess::Type ch);
 
 sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
-                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition);
+                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition,
+                                 bool someoneLost);
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
                                    sf::Sprite *piecesSprites, bool &movingAPiece,
@@ -67,5 +72,7 @@ void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *pieces
              sf::Vector2i mousePositionOnBoard);
 
 bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoordinates);
+
+bool checkForCheckMate(Chess::Board &mainBoard, Chess::Color color);
 
 #endif //WINDOWMANAGER_H

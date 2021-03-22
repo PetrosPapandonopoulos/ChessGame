@@ -61,7 +61,7 @@ Board::Board() {
     turnFor = Color::White;
 }
 
-bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
+bool Board::move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove) {
     
     if (board[currentCol][currentRow] != nullptr) {
         
@@ -81,8 +81,9 @@ bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
                 this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
                 return false;
             }
-            
-            
+            if (pseudoMove){
+                this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
+            }
             return true;
         }
         else if (result == MoveResponse::Moved) {
@@ -96,6 +97,9 @@ bool Board::move(int currentCol, int currentRow, int newCol, int newRow) {
             if (checkingForChecks(enemyColor, kingCoordinates)) {
                 this->unMove(currentCol, currentRow, newCol, newRow);
                 return false;
+            }
+            if (pseudoMove){
+                this->unMove(currentCol, currentRow, newCol, newRow);
             }
             
             return true;
@@ -118,7 +122,7 @@ void Board::unMove(int currentCol, int currentRow, int newCol, int newRow) {
     this->board[newCol][newRow] = nullptr;
 }
 
-bool Board::checkingForChecks(Color teamColor, std::pair<int, int>& kingCoordinates) const{
+bool Board::checkingForChecks(Color teamColor, std::pair<int, int> &kingCoordinates) const {
     
     std::vector<std::pair<int, int>> validCoordinates;
     
@@ -148,6 +152,28 @@ bool Board::checkingForChecks(Color teamColor, std::pair<int, int>& kingCoordina
     }
 }
 
+bool Board::checkForCheckmate(Color teamColor){
+    
+    std::vector<std::pair<int, int>> validCoordinates;
+    
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            validCoordinates.clear();
+            if (board[i][j] != nullptr) {
+                if (board[i][j]->getColor() != teamColor) {
+                    board[i][j]->getAllPossibleMoves(validCoordinates, *this);
+                    for (auto it = validCoordinates.begin(); it < validCoordinates.end(); it++) {
+                        if (move(i, j, it->first, it->second, true)){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool Board::isEmpty(int row, int col) const {
     return board[row][col] == nullptr;
 }
@@ -168,15 +194,15 @@ void Board::nextTurn() {
     turnFor = turnFor == Color::White ? Color::Black : Color::White;
 }
 
-Color Board::checkForPromotion(){
-    for(int i = 0; i < BOARD_SIZE; i++){
-        if (!isEmpty(0, i)){
-            if(board[0][i]->getPieceName() == Type::Pawn){
+Color Board::checkForPromotion() {
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        if (!isEmpty(0, i)) {
+            if (board[0][i]->getPieceName() == Type::Pawn) {
                 return Color::White;
             }
         }
-        if(!isEmpty(7, i)){
-            if(board[7][i]->getPieceName() == Type::Pawn){
+        if (!isEmpty(7, i)) {
+            if (board[7][i]->getPieceName() == Type::Pawn) {
                 return Color::Black;
             }
         }
@@ -185,7 +211,7 @@ Color Board::checkForPromotion(){
 }
 
 bool Board::promote(std::pair<int, int> pieceCoordinates, Type promoteTo) {
-    if (board[pieceCoordinates.first][pieceCoordinates.second]->getPieceName() == Type::Pawn){
+    if (board[pieceCoordinates.first][pieceCoordinates.second]->getPieceName() == Type::Pawn) {
         int col = pieceCoordinates.first;
         int row = pieceCoordinates.second;
         Color newColor = getColor(col, row);
@@ -193,28 +219,32 @@ bool Board::promote(std::pair<int, int> pieceCoordinates, Type promoteTo) {
         
         switch (promoteTo) {
             case Type::Rook: {
-                board[col][row] = std::move(std::unique_ptr<Piece>(new Rook(newColor, col, row, newNumOfSprite, Type::Rook)));
+                board[col][row] = std::move(
+                        std::unique_ptr<Piece>(new Rook(newColor, col, row, newNumOfSprite, Type::Rook)));
                 break;
             }
             case Type::Horse: {
-                board[col][row] = std::move(std::unique_ptr<Piece>(new Horse(newColor, col, row, newNumOfSprite, Type::Horse)));
+                board[col][row] = std::move(
+                        std::unique_ptr<Piece>(new Horse(newColor, col, row, newNumOfSprite, Type::Horse)));
                 break;
             }
             case Type::Bishop: {
-                board[col][row] = std::move(std::unique_ptr<Piece>(new Bishop(newColor, col, row, newNumOfSprite, Type::Bishop)));
+                board[col][row] = std::move(
+                        std::unique_ptr<Piece>(new Bishop(newColor, col, row, newNumOfSprite, Type::Bishop)));
                 break;
             }
             case Type::Queen: {
-                board[col][row] = std::move(std::unique_ptr<Piece>(new Queen(newColor, col, row, newNumOfSprite, Type::Queen)));
+                board[col][row] = std::move(
+                        std::unique_ptr<Piece>(new Queen(newColor, col, row, newNumOfSprite, Type::Queen)));
                 break;
             }
-            default:{
+            default: {
             
             }
         }
         return true;
     }
-    else{
+    else {
         std::cout << "Error" << std::endl;
         return false;
     }

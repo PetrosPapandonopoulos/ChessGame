@@ -5,7 +5,7 @@ void windowManager() {
     sf::Sprite piecesSprites[32];
     sf::Texture PiecesTextures[12];
     sf::Text cordTipsSprites[16];
-    sf::Vector2f tileDim(window.getSize().x / 8.0, window.getSize().y / 8.0);
+    sf::Vector2f tileDim(window.getSize().x / (float) BOARD_SIZE, window.getSize().y / (float) BOARD_SIZE);
     sf::Image icon;
     sf::Font font;
     
@@ -13,8 +13,9 @@ void windowManager() {
     font.loadFromFile("Resources/RobotoMono-Regular.ttf");
     icon.loadFromFile("Sprites/icon.png");
     
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    
     window.setVerticalSyncEnabled(true);
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     
     loadSprites(piecesSprites, PiecesTextures, tileDim);
     loadCordTips(cordTipsSprites, tileDim, font);
@@ -37,6 +38,7 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
     
     bool canPromote = false;
     bool movingAPiece = false;
+    bool someoneLost = false;
     
     
     while (window.isOpen()) {
@@ -50,7 +52,8 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             }
             
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
-                buttonPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece, pieceLastPosition);
+                buttonPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece, pieceLastPosition,
+                                    someoneLost);
             }
             
             if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && movingAPiece) {
@@ -59,7 +62,8 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             }
         }
         
-        renderFrame(window, mainBoard, tileDim, piecesSprites, cordTipsSprites, fadeTransparency, dt);
+        renderFrame(window, mainBoard, tileDim, piecesSprites, cordTipsSprites, fadeTransparency, dt, someoneLost);
+        
         
         if (canPromote) {
             promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard);
@@ -67,13 +71,23 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         }
         
         dt = deltaClock.restart();
+        
+        if (checkForCheckMate(mainBoard, Chess::Color::White) && !someoneLost) {
+            std::cout << "The white pieces won" << std::endl;
+            someoneLost = true;
+            
+        }
+        else if (checkForCheckMate(mainBoard, Chess::Color::Black) && !someoneLost) {
+            std::cout << "The black pieces won" << std::endl;
+            someoneLost = true;
+        }
     }
     
 }
 
 void
 renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Sprite *piecesSprites,
-            sf::Text *cordTipsSprites, int &fadeTransparency, sf::Time dt) {
+            sf::Text *cordTipsSprites, int &fadeTransparency, sf::Time dt, bool someoneLost) {
     window.clear(sf::Color::Black);
     
     drawTiles(window, tileDim, {BOARD_SIZE, BOARD_SIZE});
@@ -81,6 +95,10 @@ renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2
     drawCordTips(window, cordTipsSprites);
     
     checkAndDrawFadeEffect(window, mainBoard, tileDim, dt, fadeTransparency);
+    
+    if (someoneLost) {
+        findAndIndicateKing(window, mainBoard, tileDim);
+    }
     
     drawBoardPieces(window, piecesSprites, mainBoard);
     
@@ -182,25 +200,6 @@ void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vect
     }
 }
 
-void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> dimOnWindow) {
-    
-    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
-    
-    for (int i = 0; i < dimOnWindow.first; i++) {
-        for (int j = 0; j < dimOnWindow.second; j++) {
-            if (i % 2 == j % 2) {
-                square.setFillColor(BOARD_WHITE);
-            }
-            else {
-                square.setFillColor(BOARD_BLACK);
-            }
-            
-            square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
-            window.draw(square);
-        }
-    }
-}
-
 void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font) {
     
     for (int i = 0; i < 8; i++) {
@@ -228,6 +227,32 @@ void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Fon
         cordTipsSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * i + (tileDim.x - FONT_LETTERS_X),
                                                         tileDim.y * 7 + (tileDim.y - FONT_LETTERS_Y)));
     }
+}
+
+void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> dimOnWindow) {
+    
+    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
+    
+    for (int i = 0; i < dimOnWindow.first; i++) {
+        for (int j = 0; j < dimOnWindow.second; j++) {
+            if (i % 2 == j % 2) {
+                square.setFillColor(BOARD_WHITE);
+            }
+            else {
+                square.setFillColor(BOARD_BLACK);
+            }
+            
+            square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
+            window.draw(square);
+        }
+    }
+}
+
+void drawATileRed(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> tileCoordinates) {
+    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
+    square.setFillColor(sf::Color::Red);
+    square.setPosition(sf::Vector2f(tileDim.x * tileCoordinates.second, tileDim.y * tileCoordinates.first));
+    window.draw(square);
 }
 
 void drawCordTips(sf::RenderWindow &window, sf::Text *cordTipsSprites) {
@@ -304,25 +329,19 @@ Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
     
     sf::RenderWindow window(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
                             "Choose a Piece", sf::Style::Titlebar);
-    
     sf::Vector2f tileDim(window.getSize().y, window.getSize().y);
+    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     sf::Sprite piecesSprites[4];
+    int offSetBasedOnColor = color == Chess::Color::Black ? 0 : 6;
+    
     sf::Image icon;
     icon.loadFromFile("Sprites/icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     
-    if (color == Chess::Color::Black) {
-        for (int i = 0; i < 4; i++) {
-            piecesSprites[i].setTexture(PiecesTextures[i]);
-            piecesSprites[i].setPosition(sf::Vector2f(tileDim.x * i, 0.f));
-        }
-    }
-    else {
-        for (int i = 0; i < 4; i++) {
-            piecesSprites[i].setTexture(PiecesTextures[i + 6]);
-            piecesSprites[i].setPosition(sf::Vector2f(tileDim.x * i, 0.f));
-        }
+    
+    for (int i = 0; i < 4; i++) {
+        piecesSprites[i].setTexture(PiecesTextures[i + offSetBasedOnColor]);
+        piecesSprites[i].setPosition(sf::Vector2f(tileDim.x * i, 0.f));
     }
     
     for (auto &piecesSprite : piecesSprites) {
@@ -415,28 +434,31 @@ void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::
 }
 
 sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim,
-                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition) {
+                                 sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition,
+                                 bool someoneLost) {
     
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
                                       mousePosition.y / ((int) tileDim.y));
-    
-    if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
-        if (checkTurn(mainBoard, mousePositionOnBoard)) {
-            if (!movingAPiece) {
-                movingAPiece = true;
-                pieceLastPosition = mousePositionOnBoard;
+    if (!someoneLost) {
+        if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
+            if (checkTurn(mainBoard, mousePositionOnBoard)) {
+                if (!movingAPiece) {
+                    movingAPiece = true;
+                    pieceLastPosition = mousePositionOnBoard;
+                }
             }
+        }
+        
+        if (movingAPiece) {
+            //drag piece with cursor
+            int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
+            float newX = mousePosition.x - tileDim.x / 2;
+            float newY = mousePosition.y - tileDim.y / 2;
+            piecesSprites[index].setPosition(newX, newY);
         }
     }
     
-    if (movingAPiece) {
-        //drag piece with cursor
-        int index = mainBoard.getNumOfSprite(pieceLastPosition.y, pieceLastPosition.x);
-        float newX = mousePosition.x - tileDim.x / 2;
-        float newY = mousePosition.y - tileDim.y / 2;
-        piecesSprites[index].setPosition(newX, newY);
-    }
     return mousePositionOnBoard;
 }
 
@@ -453,7 +475,7 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
     if (checkBounds(mousePositionOnBoard)) {
         
         if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y,
-                           mousePositionOnBoard.x)) {
+                           mousePositionOnBoard.x, false)) {
             
             setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
             
@@ -462,6 +484,7 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
             if (result == Chess::Color::Black || result == Chess::Color::White) {
                 canPromote = true;
             }
+            
             
             mainBoard.nextTurn();
         }
@@ -491,4 +514,26 @@ void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *pieces
 bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoordinates) {
     return mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates) ||
            mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates);
+}
+
+bool checkForCheckMate(Chess::Board &mainBoard, Chess::Color color) {
+    std::pair<int, int> kingCoordinates;
+    if (mainBoard.checkingForChecks(color, kingCoordinates)) {
+        if (mainBoard.checkForCheckmate(color)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void findAndIndicateKing(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim) {
+    
+    std::pair<int, int> kingCoordinates;
+    
+    if (mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates)) {
+        drawATileRed(window, tileDim, kingCoordinates);
+    }
+    else if (mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
+        drawATileRed(window, tileDim, kingCoordinates);
+    }
 }

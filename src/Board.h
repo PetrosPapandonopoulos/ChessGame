@@ -21,7 +21,7 @@ namespace Chess {
         
         Board();
         
-        bool move(int currentCol, int CurrentRow, int newCol, int newRow);
+        bool move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove);
         
         bool isEmpty(int row, int col) const;
         
@@ -38,6 +38,8 @@ namespace Chess {
         bool promote(std::pair<int, int> pieceCoordinates, Type promoteTo);
         
         bool checkingForChecks(Color teamColor, std::pair<int, int> &kingCoordinates) const;
+    
+        bool checkForCheckmate(Color teamColor);
     };
 }
 
