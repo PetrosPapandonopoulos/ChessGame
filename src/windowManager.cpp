@@ -26,11 +26,15 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
                  sf::Vector2f tileDim, sf::Text *cordTipsSprites) {
     
     Chess::Board mainBoard;
+    
     sf::Clock deltaClock;
     sf::Time dt = deltaClock.restart();
+    
     sf::Vector2i pieceLastPosition;
     sf::Vector2<int> mousePositionOnBoard;
+    
     int fadeTransparency = 255;
+    
     bool canPromote = false;
     bool movingAPiece = false;
     
@@ -72,7 +76,7 @@ renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2
             sf::Text *cordTipsSprites, int &fadeTransparency, sf::Time dt) {
     window.clear(sf::Color::Black);
     
-    drawTiles(window, tileDim);
+    drawTiles(window, tileDim, {BOARD_SIZE, BOARD_SIZE});
     
     drawCordTips(window, cordTipsSprites);
     
@@ -178,18 +182,19 @@ void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vect
     }
 }
 
-void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim) {
+void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int> dimOnWindow) {
     
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
+    for (int i = 0; i < dimOnWindow.first; i++) {
+        for (int j = 0; j < dimOnWindow.second; j++) {
             if (i % 2 == j % 2) {
                 square.setFillColor(BOARD_WHITE);
             }
             else {
                 square.setFillColor(BOARD_BLACK);
             }
+            
             square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
             window.draw(square);
         }
@@ -198,31 +203,28 @@ void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim) {
 
 void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font) {
     
-    cordTipsSprites[8].setString('a');
-    cordTipsSprites[9].setString('b');
-    cordTipsSprites[10].setString('c');
-    cordTipsSprites[11].setString('d');
-    cordTipsSprites[12].setString('e');
-    cordTipsSprites[13].setString('f');
-    cordTipsSprites[14].setString('g');
-    cordTipsSprites[15].setString('h');
-    
-    
     for (int i = 0; i < 8; i++) {
         cordTipsSprites[7 - i].setFont(font);
         cordTipsSprites[8 + i].setFont(font);
+        
         cordTipsSprites[7 - i].setString(std::to_string(8 - i));
+        cordTipsSprites[8 + i].setString(std::string(1, 'a' + i));
+        
         cordTipsSprites[7 - i].setCharacterSize(FONT_SIZE);
         cordTipsSprites[8 + i].setCharacterSize(FONT_SIZE);
+        
         if (i % 2 == 0) {
+            
             cordTipsSprites[7 - i].setFillColor(BOARD_BLACK);
             cordTipsSprites[8 + i].setFillColor(BOARD_WHITE);
         }
         else {
+            
             cordTipsSprites[7 - i].setFillColor(BOARD_WHITE);
             cordTipsSprites[8 + i].setFillColor(BOARD_BLACK);
         }
         cordTipsSprites[7 - i].setPosition(sf::Vector2f(FONT_POS, tileDim.y * i));
+        
         cordTipsSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * i + (tileDim.x - FONT_LETTERS_X),
                                                         tileDim.y * 7 + (tileDim.y - FONT_LETTERS_Y)));
     }
@@ -339,52 +341,42 @@ Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
             
             
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
+                
                 sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
                 sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
                                                   mousePosition.y / ((int) tileDim.y));
                 
-                std::cout << mousePositionOnBoard.x + 1 << std::endl;
-                
-                if (mousePositionOnBoard.x == 0) {
-                    std::cout << "User choose Rook!" << std::endl;
-                    window.close();
-                    return Chess::Type::Rook;
-                }
-                else if (mousePositionOnBoard.x == 1) {
-                    std::cout << "User choose Horse!" << std::endl;
-                    window.close();
-                    return Chess::Type::Horse;
-                }
-                else if (mousePositionOnBoard.x == 2) {
-                    std::cout << "User choose Bishop!" << std::endl;
-                    window.close();
-                    return Chess::Type::Bishop;
-                }
-                else if (mousePositionOnBoard.x == 3) {
-                    window.close();
-                    std::cout << "User choose Queen!" << std::endl;
-                    return Chess::Type::Queen;
+                switch (mousePositionOnBoard.x) {
+                    case 0: {
+                        std::cout << "User choose Rook!" << std::endl;
+                        window.close();
+                        return Chess::Type::Rook;
+                    }
+                    case 1: {
+                        std::cout << "User choose Horse!" << std::endl;
+                        window.close();
+                        return Chess::Type::Horse;
+                    }
+                    case 2: {
+                        std::cout << "User choose Bishop!" << std::endl;
+                        window.close();
+                        return Chess::Type::Bishop;
+                    }
+                    case 3: {
+                        window.close();
+                        std::cout << "User choose Queen!" << std::endl;
+                        return Chess::Type::Queen;
+                    }
                 }
             }
         }
         
-        if (color == Chess::Color::Black) {
-            window.clear(BOARD_WHITE);
-        }
-        else {
-            window.clear(BOARD_BLACK);
-        }
+        window.clear(sf::Color::Black);
         
-        for (int i = 0; i < 4; i++) {
-            if (i % 2 == 0) {
-                square.setFillColor(BOARD_WHITE);
-            }
-            else {
-                square.setFillColor(BOARD_BLACK);
-            }
-            square.setPosition(sf::Vector2f(tileDim.x * i, 0.f));
-            window.draw(square);
-            window.draw(piecesSprites[i]);
+        drawTiles(window, tileDim, {4, 1});
+        
+        for (const auto &piecesSprite : piecesSprites) {
+            window.draw(piecesSprite);
         }
         
         window.display();

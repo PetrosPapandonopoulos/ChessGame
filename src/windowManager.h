@@ -30,7 +30,7 @@ void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim,  const sf::Fo
 
 void drawCordTips(sf::RenderWindow &window, sf::Text *cordTipsSprites);
 
-void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim);
+void drawTiles(sf::RenderWindow &window, sf::Vector2f tileDim, std::pair<int, int>dimOnWindow);
 
 void drawBoardPieces(sf::RenderWindow &window, sf::Sprite *piecesSprites, const Chess::Board &mainBoard);
 
