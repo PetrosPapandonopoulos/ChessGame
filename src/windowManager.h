@@ -1,6 +1,6 @@
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H
-#define MAIN_WINDOW_SIZE        900
+#define MAIN_WINDOW_SIZE        896
 #define FONT_SIZE               MAIN_WINDOW_SIZE / 37.5
 #define FONT_POS                MAIN_WINDOW_SIZE / 180
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45
@@ -11,6 +11,7 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Board.h"
 #include <string>
 #include <iostream>
@@ -18,7 +19,7 @@
 void windowManager();
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
-                 sf::Vector2f tileDim, sf::Text *cordTipsSprites);
+                 sf::Vector2f tileDim, sf::Text *cordTipsSprites, sf::Sound& moveSound);
 
 void
 renderFrame(sf::RenderWindow &window, const Chess::Board &mainBoard, sf::Vector2f tileDim, sf::Sprite *piecesSprites,
@@ -55,7 +56,7 @@ bool checkBounds(sf::Vector2i mousePositionOnBoard);
 
 bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard);
 
-Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color);
+Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color);
 
 void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Color result,
                   const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard, Chess::Type ch);
@@ -66,7 +67,7 @@ sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &m
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
                                    sf::Sprite *piecesSprites, bool &movingAPiece,
-                                   sf::Vector2i &pieceLastPosition, bool &canPromote);
+                                   sf::Vector2i &pieceLastPosition, bool &canPromote, sf::Sound& moveSound);
 
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
              sf::Vector2i mousePositionOnBoard);

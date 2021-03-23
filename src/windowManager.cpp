@@ -8,10 +8,14 @@ void windowManager() {
     sf::Vector2f tileDim(window.getSize().x / (float) BOARD_SIZE, window.getSize().y / (float) BOARD_SIZE);
     sf::Image icon;
     sf::Font font;
+    sf::SoundBuffer buffer;
+    sf::Sound moveSound;
     
     
+    buffer.loadFromFile("Resources/PieceAudio.wav");
     font.loadFromFile("Resources/RobotoMono-Regular.ttf");
     icon.loadFromFile("Sprites/icon.png");
+    
     
     
     window.setVerticalSyncEnabled(true);
@@ -19,12 +23,13 @@ void windowManager() {
     
     loadSprites(piecesSprites, PiecesTextures, tileDim);
     loadCordTips(cordTipsSprites, tileDim, font);
+    moveSound.setBuffer(buffer);
     
-    windowCycle(window, piecesSprites, PiecesTextures, tileDim, cordTipsSprites);
+    windowCycle(window, piecesSprites, PiecesTextures, tileDim, cordTipsSprites, moveSound);
 }
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
-                 sf::Vector2f tileDim, sf::Text *cordTipsSprites) {
+                 sf::Vector2f tileDim, sf::Text *cordTipsSprites, sf::Sound& moveSound) {
     
     Chess::Board mainBoard;
     
@@ -58,7 +63,7 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
             
             if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus() && movingAPiece) {
                 mousePositionOnBoard = buttonUnPressedAction(window, mainBoard, tileDim, piecesSprites, movingAPiece,
-                                                             pieceLastPosition, canPromote);
+                                                             pieceLastPosition, canPromote, moveSound);
             }
         }
         
@@ -325,7 +330,8 @@ bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard)
     return mainBoard.getColor(mousePositionOnBoard.y, mousePositionOnBoard.x) == mainBoard.getWhoseTurn();
 }
 
-Chess::Type getAChoiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
+// break this shit, too big
+Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
     
     sf::RenderWindow window(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
                             "Choose a Piece", sf::Style::Titlebar);
@@ -464,7 +470,7 @@ sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &m
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
                                    sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition,
-                                   bool &canPromote) {
+                                   bool &canPromote, sf::Sound& moveSound) {
     
     movingAPiece = false;
     
@@ -478,6 +484,7 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
                            mousePositionOnBoard.x, false)) {
             
             setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
+            moveSound.play();
             
             Chess::Color result = mainBoard.checkForPromotion();
             
@@ -501,7 +508,7 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
              sf::Vector2i mousePositionOnBoard) {
     
-    Chess::Type ch = getAChoiceWindow(piecesTexture, result);
+    Chess::Type ch = choiceWindow(piecesTexture, result);
     
     changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
                  ch);
