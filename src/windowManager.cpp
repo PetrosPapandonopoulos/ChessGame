@@ -322,6 +322,15 @@ void setNewPosition(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf
     piecesSprites[index].setPosition(newX, newY);
 }
 
+void setNewPositionStatic(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i newPosition, sf::Vector2f tileDim) {
+    
+    int index = mainBoard.getNumOfSprite(newPosition.x, newPosition.y);
+    float newX = newPosition.x * tileDim.x;
+    float newY = newPosition.y * tileDim.y;
+    piecesSprites[index].setPosition(newY, newX);
+    
+}
+
 bool checkBounds(sf::Vector2i mousePositionOnBoard) {
     return mousePositionOnBoard.x >= 0 && mousePositionOnBoard.x < 8 && mousePositionOnBoard.y >= 0 &&
            mousePositionOnBoard.y < 8;
@@ -452,6 +461,7 @@ sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &m
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
                                       mousePosition.y / ((int) tileDim.y));
+    
     if (!someoneLost) {
         if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
             if (checkTurn(mainBoard, mousePositionOnBoard)) {
@@ -485,12 +495,24 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
                                       mousePosition.y / ((int) tileDim.y));
     
     if (checkBounds(mousePositionOnBoard)) {
+        Chess::MoveResponse movedResult = mainBoard.move(pieceLastPosition.y, pieceLastPosition.x,
+                                                         mousePositionOnBoard.y,
+                                                         mousePositionOnBoard.x, false);
         
-        if (mainBoard.move(pieceLastPosition.y, pieceLastPosition.x, mousePositionOnBoard.y,
-                           mousePositionOnBoard.x, false)) {
+        if (movedResult != Chess::MoveResponse::Failed) {
             
             setNewPosition(piecesSprites, mainBoard, mousePositionOnBoard, mousePosition, tileDim);
+            
             moveSound.play();
+            
+            if (movedResult == Chess::MoveResponse::QueenSideCastling) {
+                int ColBasedOnColor = mainBoard.getWhoseTurn() == Chess::Color::Black ? 0 : 7;
+                setNewPositionStatic(piecesSprites, mainBoard, {ColBasedOnColor, 3}, tileDim);
+            }
+            else if (movedResult == Chess::MoveResponse::KingSideCastling) {
+                int ColBasedOnColor = mainBoard.getWhoseTurn() == Chess::Color::Black ? 0 : 7;
+                setNewPositionStatic(piecesSprites, mainBoard, {ColBasedOnColor, 5}, tileDim);
+            }
             
             Chess::Color result = mainBoard.checkForPromotion();
             

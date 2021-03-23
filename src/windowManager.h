@@ -52,6 +52,8 @@ void placeAPieceBack(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, s
 void setNewPosition(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard,
                     sf::Vector2i mousePosition, sf::Vector2f tileDim);
 
+void setNewPositionStatic(sf::Sprite *piecesSprites, const Chess::Board &mainBoard, sf::Vector2i newPosition, sf::Vector2f tileDim);
+
 bool checkBounds(sf::Vector2i mousePositionOnBoard);
 
 bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard);

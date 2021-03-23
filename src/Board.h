@@ -17,11 +17,13 @@ namespace Chess {
         
         void unMove(int currentCol, int CurrentRow, int newCol, int newRow);
     
+        void moveObject(int currentCol, int currentRow, int newCol, int newRow);
+    
     public:
         
         Board();
-        
-        bool move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove);
+    
+        MoveResponse move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove);
         
         bool isEmpty(int row, int col) const;
         

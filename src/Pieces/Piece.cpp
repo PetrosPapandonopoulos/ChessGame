@@ -56,7 +56,7 @@ void Piece::pieceMoved() {
     this->hasMoved = true;
 }
 
-bool Piece::getHasMoved(){
+bool Piece::getHasMoved() const{
     return hasMoved;
 }
 

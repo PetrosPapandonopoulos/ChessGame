@@ -13,9 +13,12 @@ MoveResponse King::checkMove(int newCol, int newRow, const Board &board) {
     
     getAllPossibleMoves(validCoordinates, board);
     
-    checkCastling(validCoordinates, board);
+    checkCastling(specialValidCoordinates, board);
+    
     MoveResponse normalMoves = checkIfBelongs(validCoordinates, {newCol, newRow}, board);
+    
     MoveResponse castlingMoves = checkIfBelongs(specialValidCoordinates, {newCol, newRow}, board);
+    
     if (normalMoves == MoveResponse::Moved || normalMoves == MoveResponse::Ate){
         return normalMoves;
     }
@@ -46,18 +49,18 @@ void King::getAllPossibleMoves(std::vector<std::pair<int, int>> &validCoordinate
 
 void King::checkCastling(std::vector<std::pair<int, int>> &validCoordinates, const Board &board) {
     
-    std::pair<int, int> kingCoordinates;
-    Color EnemyTeamColor = this->getColor() == Color::Black ? Color::White : Color::Black;
+    
     int ColBasedOnColor = this->getColor() == Color::Black ? 0 : 7;
     
-    if (!board.checkingForChecks(EnemyTeamColor, kingCoordinates) && !hasMoved) {
+    if (!hasMoved) {
         if (!board.getHasMoved(ColBasedOnColor, 0)) {
             if (board.isEmpty(ColBasedOnColor, 1) && board.isEmpty(ColBasedOnColor, 2) &&
                 board.isEmpty(ColBasedOnColor, 3)) {
                 validCoordinates.emplace_back(ColBasedOnColor, 2);
             }
         }
-        else if (!board.getHasMoved(ColBasedOnColor, 7)){
+        
+        if (!board.getHasMoved(ColBasedOnColor, 7)){
             if (board.isEmpty(ColBasedOnColor, 5) && board.isEmpty(ColBasedOnColor, 6)) {
                 validCoordinates.emplace_back(ColBasedOnColor, 6);
             }

@@ -61,56 +61,118 @@ Board::Board() {
     turnFor = Color::White;
 }
 
-bool Board::move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove) {
+MoveResponse Board::move(int currentCol, int currentRow, int newCol, int newRow, bool pseudoMove) {
     
     if (board[currentCol][currentRow] != nullptr) {
         
         MoveResponse result = board[currentCol][currentRow]->checkMove(newCol, newRow, *this);
+        
         std::pair<int, int> kingCoordinates;
+        
         if (result == MoveResponse::Ate) {
+            
             std::unique_ptr<Piece> pieceEaten = std::move(this->board[newCol][newRow]);
             
-            this->board[newCol][newRow] = std::move(this->board[currentCol][currentRow]);
-            board[currentCol][currentRow] = nullptr;
-            board[newCol][newRow]->setCurrentCol(newCol);
-            board[newCol][newRow]->setCurrentRow(newRow);
+            moveObject(currentCol, currentRow, newCol, newRow);
             
             //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
             if (checkingForChecks(enemyColor, kingCoordinates)) {
                 this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
-                return false;
+                return MoveResponse::Failed;
             }
             if (pseudoMove) {
                 this->unMove(currentCol, currentRow, newCol, newRow, pieceEaten);
             }
-            else{
+            else {
                 board[newCol][newRow]->pieceMoved();
             }
-            return true;
+            return MoveResponse::Ate;
         }
         else if (result == MoveResponse::Moved) {
-            this->board[newCol][newRow] = std::move(this->board[currentCol][currentRow]);
-            this->board[currentCol][currentRow] = nullptr;
-            this->board[newCol][newRow]->setCurrentCol(newCol);
-            this->board[newCol][newRow]->setCurrentRow(newRow);
+            moveObject(currentCol, currentRow, newCol, newRow);
             
-            //todo checkingForCheckers function
             Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
+            
             if (checkingForChecks(enemyColor, kingCoordinates)) {
                 this->unMove(currentCol, currentRow, newCol, newRow);
-                return false;
+                return MoveResponse::Failed;
             }
+            
             if (pseudoMove) {
                 this->unMove(currentCol, currentRow, newCol, newRow);
             }
             else {
                 board[newCol][newRow]->pieceMoved();
             }
-            return true;
+            return MoveResponse::Moved;
+        }
+        else if (result == MoveResponse::QueenSideCastling) {
+            
+            Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
+            
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                return MoveResponse::Failed;
+            }
+            
+            //check first tile if its dominated
+            moveObject(currentCol, currentRow, currentCol, currentRow - 1);
+            int ColBasedOnColor = turnFor == Color::Black ? 0 : 7;
+            
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                this->unMove(currentCol, currentRow, currentCol, currentRow - 1);
+                return MoveResponse::Failed;
+            }
+            this->unMove(currentCol, currentRow, currentCol, currentRow - 1);
+            
+            //check if second tile end's up in check
+            moveObject(currentCol, currentRow, newCol, newRow);
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                this->unMove(currentCol, currentRow, newCol, newRow);
+                return MoveResponse::Failed;
+            }
+            
+            //move Rook
+            moveObject(ColBasedOnColor, 0, ColBasedOnColor, 3);
+            board[newCol][newRow]->pieceMoved();
+            board[ColBasedOnColor][3]->pieceMoved();
+            return MoveResponse::QueenSideCastling;
+        }
+        else if (result == MoveResponse::KingSideCastling) {
+            
+            Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
+            
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                return MoveResponse::Failed;
+            }
+            
+            //check first tile if its dominated
+            moveObject(currentCol, currentRow, currentCol, currentRow + 1);
+            
+            int ColBasedOnColor = turnFor == Color::Black ? 0 : 7;
+            
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                this->unMove(currentCol, currentRow, currentCol, currentRow + 1);
+                return MoveResponse::Failed;
+            }
+            this->unMove(currentCol, currentRow, currentCol, currentRow + 1);
+            
+            //check if second tile end's up in check
+            moveObject(currentCol, currentRow, newCol, newRow);
+            if (checkingForChecks(enemyColor, kingCoordinates)) {
+                this->unMove(currentCol, currentRow, newCol, newRow);
+                return MoveResponse::Failed;
+            }
+            
+            //move Rook
+            moveObject(ColBasedOnColor, 7, ColBasedOnColor, 5);
+            board[newCol][newRow]->pieceMoved();
+            board[ColBasedOnColor][5]->pieceMoved();
+            return MoveResponse::KingSideCastling;
         }
     }
-    return false;
+    
+    return MoveResponse::Failed;
 }
 
 void Board::unMove(int currentCol, int currentRow, int newCol, int newRow, std::unique_ptr<Piece> &pieceEaten) {
@@ -125,6 +187,14 @@ void Board::unMove(int currentCol, int currentRow, int newCol, int newRow) {
     this->board[currentCol][currentRow]->setCurrentCol(currentCol);
     this->board[currentCol][currentRow]->setCurrentRow(currentRow);
     this->board[newCol][newRow] = nullptr;
+}
+
+void Board::moveObject(int currentCol, int currentRow, int newCol, int newRow) {
+    
+    this->board[newCol][newRow] = std::move(this->board[currentCol][currentRow]);
+    this->board[currentCol][currentRow] = nullptr;
+    this->board[newCol][newRow]->setCurrentCol(newCol);
+    this->board[newCol][newRow]->setCurrentRow(newRow);
 }
 
 bool Board::checkingForChecks(Color teamColor, std::pair<int, int> &kingCoordinates) const {
@@ -168,7 +238,7 @@ bool Board::checkForCheckmate(Color teamColor) {
                 if (board[i][j]->getColor() != teamColor) {
                     board[i][j]->getAllPossibleMoves(validCoordinates, *this);
                     for (auto it = validCoordinates.begin(); it < validCoordinates.end(); it++) {
-                        if (move(i, j, it->first, it->second, true)) {
+                        if (move(i, j, it->first, it->second, true) != MoveResponse::Failed) {
                             return false;
                         }
                     }
@@ -191,7 +261,7 @@ int Board::getNumOfSprite(int i, int j) const {
     return board[i][j]->getNumOfSprite();
 }
 
-bool Board::getHasMoved(int col , int row) const{
+bool Board::getHasMoved(int col, int row) const {
     return board[col][row]->getHasMoved();
 }
 

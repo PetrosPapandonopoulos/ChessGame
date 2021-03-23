@@ -56,7 +56,7 @@ namespace Chess {
         
         void pieceMoved();
         
-        bool getHasMoved();
+        bool getHasMoved() const;
 
         int getNumOfSprite() const;
 
