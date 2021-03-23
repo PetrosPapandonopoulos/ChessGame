@@ -191,6 +191,10 @@ int Board::getNumOfSprite(int i, int j) const {
     return board[i][j]->getNumOfSprite();
 }
 
+bool Board::getHasMoved(int col , int row) const{
+    return board[col][row]->getHasMoved();
+}
+
 Color Board::getWhoseTurn() const {
     return turnFor;
 }

@@ -31,6 +31,8 @@ namespace Chess {
         
         Color getWhoseTurn() const;
         
+        bool getHasMoved(int col , int row) const;
+        
         void nextTurn();
         
         Color checkForPromotion();
