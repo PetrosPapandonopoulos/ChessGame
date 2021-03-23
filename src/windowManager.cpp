@@ -17,7 +17,6 @@ void windowManager() {
     icon.loadFromFile("Sprites/icon.png");
     
     
-    
     window.setVerticalSyncEnabled(true);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     
@@ -29,7 +28,7 @@ void windowManager() {
 }
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
-                 sf::Vector2f tileDim, sf::Text *cordTipsSprites, sf::Sound& moveSound) {
+                 sf::Vector2f tileDim, sf::Text *cordTipsSprites, sf::Sound &moveSound) {
     
     Chess::Board mainBoard;
     
@@ -71,7 +70,9 @@ void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Textur
         
         
         if (canPromote) {
-            promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard);
+            sf::Vector2i mainWindowCoordinates = window.getPosition();
+            promote(mainBoard.checkForPromotion(), piecesTexture, piecesSprites, mainBoard, mousePositionOnBoard,
+                    mainWindowCoordinates);
             canPromote = false;
         }
         
@@ -331,18 +332,22 @@ bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard)
 }
 
 // break this shit, too big
-Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
+Chess::Type choiceWindow(sf::Vector2i mainWindowCoordinates, sf::Texture *PiecesTextures, Chess::Color color) {
     
-    sf::RenderWindow window(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
-                            "Choose a Piece", sf::Style::Titlebar);
-    sf::Vector2f tileDim(window.getSize().y, window.getSize().y);
+    sf::RenderWindow subWindow(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
+                               "Choose a Piece", sf::Style::Titlebar);
+    mainWindowCoordinates.x += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().x / 2;
+    mainWindowCoordinates.y += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().y / 2;
+    subWindow.setPosition(mainWindowCoordinates);
+    
+    sf::Vector2f tileDim(subWindow.getSize().y, subWindow.getSize().y);
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     sf::Sprite piecesSprites[4];
     int offSetBasedOnColor = color == Chess::Color::Black ? 0 : 6;
     
     sf::Image icon;
     icon.loadFromFile("Sprites/icon.png");
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    subWindow.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     
     
     for (int i = 0; i < 4; i++) {
@@ -355,40 +360,40 @@ Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
                                            tileDim.y / piecesSprite.getLocalBounds().height));
     }
     
-    while (window.isOpen()) {
+    while (subWindow.isOpen()) {
         
         sf::Event event{};
         
-        while (window.pollEvent(event)) {
+        while (subWindow.pollEvent(event)) {
             
             if (event.type == sf::Event::Closed) {
             }
             
             
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window.hasFocus()) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && subWindow.hasFocus()) {
                 
-                sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                sf::Vector2i mousePosition = sf::Mouse::getPosition(subWindow);
                 sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
                                                   mousePosition.y / ((int) tileDim.y));
                 
                 switch (mousePositionOnBoard.x) {
                     case 0: {
                         std::cout << "User choose Rook!" << std::endl;
-                        window.close();
+                        subWindow.close();
                         return Chess::Type::Rook;
                     }
                     case 1: {
                         std::cout << "User choose Horse!" << std::endl;
-                        window.close();
+                        subWindow.close();
                         return Chess::Type::Horse;
                     }
                     case 2: {
                         std::cout << "User choose Bishop!" << std::endl;
-                        window.close();
+                        subWindow.close();
                         return Chess::Type::Bishop;
                     }
                     case 3: {
-                        window.close();
+                        subWindow.close();
                         std::cout << "User choose Queen!" << std::endl;
                         return Chess::Type::Queen;
                     }
@@ -396,15 +401,15 @@ Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color) {
             }
         }
         
-        window.clear(sf::Color::Black);
+        subWindow.clear(sf::Color::Black);
         
-        drawTiles(window, tileDim, {4, 1});
+        drawTiles(subWindow, tileDim, {4, 1});
         
         for (const auto &piecesSprite : piecesSprites) {
-            window.draw(piecesSprite);
+            subWindow.draw(piecesSprite);
         }
         
-        window.display();
+        subWindow.display();
     }
     
     return Chess::Type::Queen;
@@ -470,7 +475,7 @@ sf::Vector2i buttonPressedAction(sf::RenderWindow &window, const Chess::Board &m
 
 sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainBoard, sf::Vector2f tileDim,
                                    sf::Sprite *piecesSprites, bool &movingAPiece, sf::Vector2i &pieceLastPosition,
-                                   bool &canPromote, sf::Sound& moveSound) {
+                                   bool &canPromote, sf::Sound &moveSound) {
     
     movingAPiece = false;
     
@@ -506,9 +511,9 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
 }
 
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
-             sf::Vector2i mousePositionOnBoard) {
+             sf::Vector2i mousePositionOnBoard, sf::Vector2i mainWindowCoordinates) {
     
-    Chess::Type ch = choiceWindow(piecesTexture, result);
+    Chess::Type ch = choiceWindow(mainWindowCoordinates, piecesTexture, result);
     
     changeSprite(piecesTexture, piecesSprites, result, mainBoard, mousePositionOnBoard,
                  ch);

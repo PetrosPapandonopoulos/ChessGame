@@ -1,6 +1,6 @@
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H
-#define MAIN_WINDOW_SIZE        896
+#define MAIN_WINDOW_SIZE        600
 #define FONT_SIZE               MAIN_WINDOW_SIZE / 37.5
 #define FONT_POS                MAIN_WINDOW_SIZE / 180
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45
@@ -56,7 +56,7 @@ bool checkBounds(sf::Vector2i mousePositionOnBoard);
 
 bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard);
 
-Chess::Type choiceWindow(sf::Texture *PiecesTextures, Chess::Color color);
+Chess::Type choiceWindow(sf::Vector2i mainWindowCoordinates, sf::Texture *PiecesTextures, Chess::Color color);
 
 void changeSprite(sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Color result,
                   const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard, Chess::Type ch);
@@ -70,7 +70,7 @@ sf::Vector2i buttonUnPressedAction(sf::RenderWindow &window, Chess::Board &mainB
                                    sf::Vector2i &pieceLastPosition, bool &canPromote, sf::Sound& moveSound);
 
 void promote(Chess::Color result, sf::Texture *piecesTexture, sf::Sprite *piecesSprites, Chess::Board &mainBoard,
-             sf::Vector2i mousePositionOnBoard);
+             sf::Vector2i mousePositionOnBoard, sf::Vector2i mainWindowCoordinates);
 
 bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoordinates);
 
