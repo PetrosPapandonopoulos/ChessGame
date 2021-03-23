@@ -36,8 +36,9 @@ namespace Chess {
         int currentRow;
         int numOfSprite;
         Type pieceName;
+        bool hasMoved;
 
-        Piece(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName);
+        Piece(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName, bool hasMoved);
 
         bool addIfValid(const Board &board, std::vector<std::pair<int, int>> &validCoordinates,
                         std::pair<int, int> coordinates);
@@ -50,6 +51,10 @@ namespace Chess {
         Color getColor();
 
         Type getPieceName();
+        
+        void pieceMoved();
+        
+        bool getHasMoved();
 
         int getNumOfSprite() const;
 

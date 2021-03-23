@@ -13,8 +13,8 @@ namespace Chess {
                              const Board &board);
 
     public:
-        Bishop(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName) : Piece(color, currentCol, currentRow,
-                                                                                     numOfSprite, pieceName) {}
+        Bishop(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName, bool hasMoved) : Piece(color, currentCol, currentRow,
+                                                                                     numOfSprite, pieceName, hasMoved) {}
 
         MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
 

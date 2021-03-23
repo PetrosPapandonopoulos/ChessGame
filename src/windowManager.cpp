@@ -335,7 +335,8 @@ bool checkTurn(const Chess::Board &mainBoard, sf::Vector2i mousePositionOnBoard)
 Chess::Type choiceWindow(sf::Vector2i mainWindowCoordinates, sf::Texture *PiecesTextures, Chess::Color color) {
     
     sf::RenderWindow subWindow(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
-                               "Choose a Piece", sf::Style::Titlebar);
+                               "Choose a Piece", sf::Style::Close);
+    //spawn subWindow on top of the main
     mainWindowCoordinates.x += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().x / 2;
     mainWindowCoordinates.y += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().y / 2;
     subWindow.setPosition(mainWindowCoordinates);
