@@ -1,6 +1,6 @@
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H
-#define MAIN_WINDOW_SIZE        600
+#define MAIN_WINDOW_SIZE        900
 #define FONT_SIZE               MAIN_WINDOW_SIZE / 37.5
 #define FONT_POS                MAIN_WINDOW_SIZE / 180
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45

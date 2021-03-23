@@ -16,7 +16,9 @@ namespace Chess {
     enum class MoveResponse {
         Moved,
         Failed,
-        Ate
+        Ate,
+        QueenSideCastling,
+        KingSideCastling
     };
 
     enum class Type {
