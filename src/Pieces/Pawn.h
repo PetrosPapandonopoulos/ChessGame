@@ -21,6 +21,8 @@ namespace Chess {
         MoveResponse checkMove(int newCol, int newRow, const Board &board) override;
         
         void getAllPossibleMoves(std::vector<std::pair<int, int>> &validCoordinates, const Board &board) override;
+    
+        void getEnPassant(std::vector<std::pair<int, int>> &validCoordinates, const Board &board);
         
     };
 }

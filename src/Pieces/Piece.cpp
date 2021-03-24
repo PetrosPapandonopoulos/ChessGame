@@ -6,7 +6,7 @@ using namespace Chess;
 
 Piece::Piece(Color color, int currentCol, int currentRow, int numOfSprite, Type pieceName, bool hasMoved) :
         color(color), currentCol(currentCol), currentRow(currentRow), numOfSprite(numOfSprite), pieceName(pieceName),
-        hasMoved(hasMoved) {}
+        hasMoved(hasMoved) {timesMoved = 0;}
 
 /* The checkIfValid method is used in all classes children of Piece,
 * so as to determine if a piece can go to the coordinates it gets as a parameter.
@@ -53,6 +53,7 @@ Type Piece::getPieceName() {
 }
 
 void Piece::pieceMoved() {
+    this->timesMoved++;
     this->hasMoved = true;
 }
 
@@ -70,4 +71,8 @@ void Piece::setCurrentCol(int newCol) {
 
 void Piece::setCurrentRow(int newRow) {
     this->currentRow = newRow;
+}
+
+int Piece::getTimesMoved() const {
+    return timesMoved;
 }

@@ -86,6 +86,8 @@ MoveResponse Board::move(int currentCol, int currentRow, int newCol, int newRow,
             }
             else {
                 board[newCol][newRow]->pieceMoved();
+                //en passant reset
+                en_passantCord = {-1, -1};
             }
             return MoveResponse::Ate;
         }
@@ -104,7 +106,16 @@ MoveResponse Board::move(int currentCol, int currentRow, int newCol, int newRow,
             }
             else {
                 board[newCol][newRow]->pieceMoved();
+                if (board[newCol][newRow]->getTimesMoved() == 1 &&
+                    board[newCol][newRow]->getPieceName() == Type::Pawn) {
+                    
+                    en_passantCord = {newCol, newRow};
+                }
+                else {
+                    en_passantCord = {-1, -1};
+                }
             }
+            
             return MoveResponse::Moved;
         }
         else if (result == MoveResponse::QueenSideCastling) {
@@ -169,6 +180,52 @@ MoveResponse Board::move(int currentCol, int currentRow, int newCol, int newRow,
             board[newCol][newRow]->pieceMoved();
             board[ColBasedOnColor][5]->pieceMoved();
             return MoveResponse::KingSideCastling;
+        }
+        else if (result == MoveResponse::EnPassant) {
+            
+            if (en_passantCord.first == -1) {
+                
+                return MoveResponse::Failed;
+            }
+            
+            int direction = board[currentCol][currentRow]->getColor() == Color::Black ? 1 : -1;
+            Color enemyColor = turnFor == Color::White ? Color::Black : Color::White;
+            
+            if (en_passantCord.first == newCol - (1 * direction) && en_passantCord.second == newRow) {
+                
+                moveObject(currentCol, currentRow, newCol, newRow);
+                std::unique_ptr<Piece> pieceEaten = std::move(board[currentCol][newRow]);
+                board[currentCol][newRow] = nullptr;
+                
+                if (checkingForChecks(enemyColor, kingCoordinates)) {
+                    
+                    this->unMove(currentCol, currentRow, newCol, newRow);
+                    board[currentCol][newRow] = std::move(pieceEaten);
+                    return MoveResponse::Failed;
+                }
+                else {
+                    
+                    return MoveResponse::EnPassant;
+                }
+            }
+            else if (en_passantCord.first == newCol + (1 * direction) && en_passantCord.second == newRow) {
+                
+                moveObject(currentCol, currentRow, newCol, newRow);
+                
+                std::unique_ptr<Piece> pieceEaten = std::move(board[currentCol][newRow]);
+                board[currentCol][newRow] = nullptr;
+                
+                if (checkingForChecks(enemyColor, kingCoordinates)) {
+                    
+                    this->unMove(currentCol, currentRow, newCol, newRow);
+                    board[currentCol][newRow] = std::move(pieceEaten);
+                    return MoveResponse::Failed;
+                }
+                else {
+                    
+                    return MoveResponse::EnPassant;
+                }
+            }
         }
     }
     
@@ -329,3 +386,6 @@ bool Board::promote(std::pair<int, int> pieceCoordinates, Type promoteTo) {
     }
 }
 
+Type Board::getPieceName(int col, int row) const {
+    return board[col][row]->getPieceName();
+}

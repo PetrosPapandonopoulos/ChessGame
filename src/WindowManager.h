@@ -35,7 +35,7 @@ class WindowManager {
         bool movingAPiece;
         bool someoneLost;
     
-    void loadSprites();
+        void loadSprites();
         
         void loadCordTips();
         

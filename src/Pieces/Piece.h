@@ -18,7 +18,8 @@ namespace Chess {
         Failed,
         Ate,
         QueenSideCastling,
-        KingSideCastling
+        KingSideCastling,
+        EnPassant
     };
 
     enum class Type {
@@ -37,6 +38,7 @@ namespace Chess {
         int currentCol;
         int currentRow;
         int numOfSprite;
+        int timesMoved;
         Type pieceName;
         bool hasMoved;
 
@@ -57,6 +59,8 @@ namespace Chess {
         void pieceMoved();
         
         bool getHasMoved() const;
+    
+        int getTimesMoved() const;
 
         int getNumOfSprite() const;
 

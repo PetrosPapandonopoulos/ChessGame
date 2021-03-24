@@ -12,6 +12,7 @@ namespace Chess {
         
         std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
         Color turnFor;
+        std::pair<int, int> en_passantCord;
         
         void unMove(int currentCol, int CurrentRow, int newCol, int newRow, std::unique_ptr<Piece> &pieceEaten);
         
@@ -34,6 +35,8 @@ namespace Chess {
         Color getWhoseTurn() const;
         
         bool getHasMoved(int col , int row) const;
+        
+        Type getPieceName(int col, int row) const;
         
         void nextTurn();
         
