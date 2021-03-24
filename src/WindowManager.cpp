@@ -158,7 +158,7 @@ void WindowManager::loadCordTips() {
 void WindowManager::renderFrame(sf::Time dt) {
     window.clear(sf::Color::Black);
     
-    drawTiles(this->window, {BOARD_SIZE, BOARD_SIZE});
+    drawTiles(this->window, this->tileDim, {BOARD_SIZE, BOARD_SIZE});
     
     drawCordTips();
     
@@ -173,7 +173,8 @@ void WindowManager::renderFrame(sf::Time dt) {
     window.display();
 }
 
-void WindowManager::drawTiles(sf::RenderWindow& renderWindow, std::pair<int, int> dimOnWindow) const {
+void WindowManager::drawTiles(sf::RenderWindow &renderWindow, sf::Vector2f tileDimension,
+                              std::pair<int, int> dimOnWindow) const {
     
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
     
@@ -186,7 +187,7 @@ void WindowManager::drawTiles(sf::RenderWindow& renderWindow, std::pair<int, int
                 square.setFillColor(BOARD_BLACK);
             }
             
-            square.setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * j));
+            square.setPosition(sf::Vector2f(tileDimension.x * i, tileDimension.y * j));
             renderWindow.draw(square);
         }
     }
@@ -283,13 +284,16 @@ Chess::Type WindowManager::choiceWindow(Chess::Color color) {
     
     sf::RenderWindow subWindow(sf::VideoMode(SPRITE_SIZE * 4, SPRITE_SIZE),
                                "Choose a Piece", sf::Style::Close);
+    
     sf::Vector2i mainWindowCoordinates(window.getPosition());
     //spawn subWindow on top of the main
     mainWindowCoordinates.x += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().x / 2;
     mainWindowCoordinates.y += MAIN_WINDOW_SIZE / 2 - subWindow.getSize().y / 2;
+    
     subWindow.setPosition(mainWindowCoordinates);
     
     sf::Vector2f subWindowTileDim(subWindow.getSize().y, subWindow.getSize().y);
+    
     sf::RectangleShape square(sf::Vector2f(subWindowTileDim.x, subWindowTileDim.y));
     sf::Sprite subWindowPiecesSprites[4];
     int offSetBasedOnColor = color == Chess::Color::Black ? 0 : 6;
@@ -350,7 +354,7 @@ Chess::Type WindowManager::choiceWindow(Chess::Color color) {
         
         subWindow.clear(sf::Color::Black);
         
-        drawTiles(subWindow, {4, 1});
+        drawTiles(subWindow, subWindowTileDim, {4, 1});
         
         for (const auto &piecesSprite : subWindowPiecesSprites) {
             subWindow.draw(piecesSprite);
@@ -465,7 +469,7 @@ sf::Vector2i WindowManager::buttonUnPressedAction(sf::Vector2i &pieceLastPositio
     return mousePositionOnBoard;
 }
 
-void  WindowManager::promote(sf::Vector2i mousePositionOnBoard) {
+void WindowManager::promote(sf::Vector2i mousePositionOnBoard) {
     
     Chess::Color color = mainBoard.checkForPromotion();
     
@@ -504,7 +508,7 @@ bool WindowManager::windowIsOpen() {
     return window.isOpen();
 }
 
-bool WindowManager::windowGetPollEvent(sf::Event& event) {
+bool WindowManager::windowGetPollEvent(sf::Event &event) {
     return window.pollEvent(event);
 }
 

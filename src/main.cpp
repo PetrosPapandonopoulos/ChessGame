@@ -5,7 +5,7 @@ void windowCycle(WindowManager &);
 int main() {
     WindowManager windowManager;
     windowCycle(windowManager);
-    return 1;
+    return 0;
 }
 
 void windowCycle(WindowManager &windowManager) {

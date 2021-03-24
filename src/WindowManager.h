@@ -39,7 +39,7 @@ class WindowManager {
         
         void loadCordTips();
         
-        void drawTiles(sf::RenderWindow& renderWindow, std::pair<int, int> dimOnWindow) const;
+        void drawTiles(sf::RenderWindow& renderWindow, sf::Vector2f tileDimension ,std::pair<int, int> dimOnWindow) const;
         
         void drawATileRed(std::pair<int, int> tileCoordinates);
         

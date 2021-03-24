@@ -53,18 +53,22 @@ void King::checkCastling(std::vector<std::pair<int, int>> &validCoordinates, con
     int ColBasedOnColor = this->getColor() == Color::Black ? 0 : 7;
     
     if (!hasMoved) {
-        if (!board.getHasMoved(ColBasedOnColor, 0)) {
-            if (board.isEmpty(ColBasedOnColor, 1) && board.isEmpty(ColBasedOnColor, 2) &&
-                board.isEmpty(ColBasedOnColor, 3)) {
-                validCoordinates.emplace_back(ColBasedOnColor, 2);
+        if (!board.isEmpty(ColBasedOnColor, 0)){
+            if (!board.getHasMoved(ColBasedOnColor, 0)) {
+                if (board.isEmpty(ColBasedOnColor, 1) && board.isEmpty(ColBasedOnColor, 2) &&
+                    board.isEmpty(ColBasedOnColor, 3)) {
+                    validCoordinates.emplace_back(ColBasedOnColor, 2);
+                }
+            }
+        }
+        if (!board.isEmpty(ColBasedOnColor, 7)){
+            if (!board.getHasMoved(ColBasedOnColor, 7)){
+                if (board.isEmpty(ColBasedOnColor, 5) && board.isEmpty(ColBasedOnColor, 6)) {
+                    validCoordinates.emplace_back(ColBasedOnColor, 6);
+                }
             }
         }
         
-        if (!board.getHasMoved(ColBasedOnColor, 7)){
-            if (board.isEmpty(ColBasedOnColor, 5) && board.isEmpty(ColBasedOnColor, 6)) {
-                validCoordinates.emplace_back(ColBasedOnColor, 6);
-            }
-        }
     }
 }
 
