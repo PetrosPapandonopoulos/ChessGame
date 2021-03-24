@@ -1,5 +1,6 @@
 #ifndef WINDOWMANAGER_H
 #define WINDOWMANAGER_H
+
 #define MAIN_WINDOW_SIZE        900
 #define FONT_SIZE               MAIN_WINDOW_SIZE / 37.5
 #define FONT_POS                MAIN_WINDOW_SIZE / 180
@@ -33,8 +34,8 @@ class WindowManager {
         bool canPromote;
         bool movingAPiece;
         bool someoneLost;
-        
-        void loadSprites();
+    
+    void loadSprites();
         
         void loadCordTips();
         
@@ -58,12 +59,26 @@ class WindowManager {
     
         void changeSprite(Chess::Color color, sf::Vector2i spriteIndexCoordinates, Chess::Type ch);
     
-        bool checkForCheckMate(Chess::Color color);
-        
-        void promote(Chess::Color color, sf::Vector2i mousePositionOnBoard);
-    
     public:
         WindowManager();
+        
+        bool windowIsOpen();
+        
+        void closeWindow();
+        
+        bool windowGetPollEvent(sf::Event& event);
+        
+        bool windowHasFocus();
+    
+        bool isMovingAPiece() const;
+    
+        bool isCanPromote() const;
+        
+        void setCanPromote(bool canPromote);
+    
+        bool isSomeoneLost() const;
+        
+        void setSomeoneLost(bool someoneLost);
         
         void renderFrame(sf::Time dt);
     
@@ -71,7 +86,7 @@ class WindowManager {
     
         void setNewPosition(sf::Vector2i mousePosition, sf::Vector2i mousePositionOnBoard);
     
-        bool checkBounds(sf::Vector2i mousePositionOnBoard);
+        static bool checkBounds(sf::Vector2i mousePositionOnBoard);
     
         bool checkTurn(sf::Vector2i Coordinates);
     
@@ -80,6 +95,10 @@ class WindowManager {
         sf::Vector2i buttonPressedAction(sf::Vector2i &pieceLastPosition);
     
         sf::Vector2i buttonUnPressedAction(sf::Vector2i &pieceLastPosition);
+    
+        bool checkForCheckMate(Chess::Color color);
+        
+        void promote(sf::Vector2i mousePositionOnBoard);
 };
 
-#endif WINDOWMANAGER_H
+#endif //WINDOWMANAGER_H

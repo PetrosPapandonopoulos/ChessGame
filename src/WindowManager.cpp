@@ -465,7 +465,9 @@ sf::Vector2i WindowManager::buttonUnPressedAction(sf::Vector2i &pieceLastPositio
     return mousePositionOnBoard;
 }
 
-void  WindowManager::promote(Chess::Color color, sf::Vector2i mousePositionOnBoard) {
+void  WindowManager::promote(sf::Vector2i mousePositionOnBoard) {
+    
+    Chess::Color color = mainBoard.checkForPromotion();
     
     Chess::Type ch = choiceWindow(color);
     
@@ -496,4 +498,40 @@ void WindowManager::findAndIndicateKing() {
     else if (mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
         drawATileRed(kingCoordinates);
     }
+}
+
+bool WindowManager::windowIsOpen() {
+    return window.isOpen();
+}
+
+bool WindowManager::windowGetPollEvent(sf::Event& event) {
+    return window.pollEvent(event);
+}
+
+void WindowManager::closeWindow() {
+    window.close();
+}
+
+bool WindowManager::windowHasFocus() {
+    return window.hasFocus();
+}
+
+bool WindowManager::isMovingAPiece() const {
+    return movingAPiece;
+}
+
+bool WindowManager::isCanPromote() const {
+    return canPromote;
+}
+
+void WindowManager::setCanPromote(bool input) {
+    canPromote = input;
+}
+
+bool WindowManager::isSomeoneLost() const {
+    return someoneLost;
+}
+
+void WindowManager::setSomeoneLost(bool input) {
+    someoneLost = input;
 }
