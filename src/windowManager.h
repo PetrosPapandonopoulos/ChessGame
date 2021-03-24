@@ -16,6 +16,32 @@
 #include <string>
 #include <iostream>
 
+
+class windowManager {
+    private:
+    sf::RenderWindow window;
+    sf::Sprite piecesSprites[32];
+    sf::Texture PiecesTextures[12];
+    sf::Text cordTipsSprites[16];
+    sf::Vector2f tileDim;
+    Chess::Board mainBoard;
+    sf::Image icon;
+    sf::SoundBuffer buffer;
+    sf::Sound moveSound;
+    
+    void loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vector2f tileDim);
+    
+    void loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font);
+    
+    public:
+        windowManager();
+        void renderFrame();
+};
+
+
+
+
+/*
 void windowManager();
 
 void windowCycle(sf::RenderWindow &window, sf::Sprite *piecesSprites, sf::Texture *piecesTexture,
@@ -79,3 +105,4 @@ bool checkForChecks(const Chess::Board &mainBoard, std::pair<int, int> &kingCoor
 bool checkForCheckMate(Chess::Board &mainBoard, Chess::Color color);
 
 #endif //WINDOWMANAGER_H
+*/

@@ -1,5 +1,153 @@
 #include "windowManager.h"
 
+windowManager::windowManager() : window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WINDOW_SIZE), "Chess game",
+                                        sf::Style::Close), mainBoard() {
+    
+    tileDim = {window.getSize().x / (float) BOARD_SIZE, window.getSize().y / (float) BOARD_SIZE};
+    
+    buffer.loadFromFile("Resources/PieceAudio.wav");
+    font.loadFromFile("Resources/RobotoMono-Regular.ttf");
+    icon.loadFromFile("Sprites/icon.png");
+    
+    window.setVerticalSyncEnabled(true);
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    
+    loadSprites(piecesSprites, PiecesTextures, tileDim);
+    loadCordTips(cordTipsSprites, tileDim, font);
+    moveSound.setBuffer(buffer);
+    
+    
+}
+
+void windowManager::loadSprites(sf::Sprite *piecesSprites, sf::Texture *piecesTexture, sf::Vector2f tileDim) {
+    
+    //load textures
+    for (int i = 0; i < 12; i++) {
+        piecesTexture[i].loadFromFile("Sprites/tile" + std::to_string(i) + ".png");
+        piecesTexture[i].setSmooth(true);
+    }
+    
+    //black pieces
+    
+    //rook
+    piecesSprites[0].setTexture(piecesTexture[0]);
+    piecesSprites[0].setPosition(sf::Vector2f(tileDim.x * 0, 0.f));
+    
+    //horse
+    piecesSprites[1].setTexture(piecesTexture[1]);
+    piecesSprites[1].setPosition(sf::Vector2f(tileDim.x * 1, 0.f));
+    
+    //bishop
+    piecesSprites[2].setTexture(piecesTexture[2]);
+    piecesSprites[2].setPosition(sf::Vector2f(tileDim.x * 2, 0.f));
+    
+    //queen
+    piecesSprites[3].setTexture(piecesTexture[3]);
+    piecesSprites[3].setPosition(sf::Vector2f(tileDim.x * 3, 0.f));
+    
+    //king
+    piecesSprites[4].setTexture(piecesTexture[4]);
+    piecesSprites[4].setPosition(sf::Vector2f(tileDim.x * 4, 0.f));
+    
+    //bishop
+    piecesSprites[5].setTexture(piecesTexture[2]);
+    piecesSprites[5].setPosition(sf::Vector2f(tileDim.x * 5, 0.f));
+    
+    //horse
+    piecesSprites[6].setTexture(piecesTexture[1]);
+    piecesSprites[6].setPosition(sf::Vector2f(tileDim.x * 6, 0.f));
+    
+    //rook
+    piecesSprites[7].setTexture(piecesTexture[0]);
+    piecesSprites[7].setPosition(sf::Vector2f(tileDim.x * 7, 0.f));
+    
+    //pawns
+    for (int i = 0; i < 8; i++) {
+        piecesSprites[8 + i].setTexture(piecesTexture[5]);
+        piecesSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * (float) i, tileDim.y));
+    }
+    
+    
+    //white pieces
+    
+    //rook
+    piecesSprites[16].setTexture(piecesTexture[6]);
+    piecesSprites[16].setPosition(sf::Vector2f(tileDim.x * 0, tileDim.y * 7));
+    
+    //horse
+    piecesSprites[17].setTexture(piecesTexture[7]);
+    piecesSprites[17].setPosition(sf::Vector2f(tileDim.x * 1, tileDim.y * 7));
+    
+    //bishop
+    piecesSprites[18].setTexture(piecesTexture[8]);
+    piecesSprites[18].setPosition(sf::Vector2f(tileDim.x * 2, tileDim.y * 7));
+    
+    //queen
+    piecesSprites[19].setTexture(piecesTexture[9]);
+    piecesSprites[19].setPosition(sf::Vector2f(tileDim.x * 3, tileDim.y * 7));
+    
+    //king
+    piecesSprites[20].setTexture(piecesTexture[10]);
+    piecesSprites[20].setPosition(sf::Vector2f(tileDim.x * 4, tileDim.y * 7));
+    
+    //bishop
+    piecesSprites[21].setTexture(piecesTexture[8]);
+    piecesSprites[21].setPosition(sf::Vector2f(tileDim.x * 5, tileDim.y * 7));
+    
+    //horse
+    piecesSprites[22].setTexture(piecesTexture[7]);
+    piecesSprites[22].setPosition(sf::Vector2f(tileDim.x * 6, tileDim.y * 7));
+    
+    //rook
+    piecesSprites[23].setTexture(piecesTexture[6]);
+    piecesSprites[23].setPosition(sf::Vector2f(tileDim.x * 7, tileDim.y * 7));
+    
+    //pawns
+    for (int i = 0; i < 8; i++) {
+        piecesSprites[24 + i].setTexture(piecesTexture[11]);
+        piecesSprites[24 + i].setPosition(sf::Vector2f(tileDim.x * i, tileDim.y * 6));
+    }
+    
+    for (int i = 0; i < 32; i++) {
+        piecesSprites[i].setScale(sf::Vector2f(tileDim.x / piecesSprites[i].getLocalBounds().width,
+                                               tileDim.y / piecesSprites[i].getLocalBounds().height));
+    }
+}
+
+void windowManager::loadCordTips(sf::Text *cordTipsSprites, sf::Vector2f tileDim, const sf::Font &font) {
+    
+    for (int i = 0; i < 8; i++) {
+        cordTipsSprites[7 - i].setFont(font);
+        cordTipsSprites[8 + i].setFont(font);
+        
+        cordTipsSprites[7 - i].setString(std::to_string(8 - i));
+        cordTipsSprites[8 + i].setString(std::string(1, 'a' + i));
+        
+        cordTipsSprites[7 - i].setCharacterSize(FONT_SIZE);
+        cordTipsSprites[8 + i].setCharacterSize(FONT_SIZE);
+        
+        if (i % 2 == 0) {
+            
+            cordTipsSprites[7 - i].setFillColor(BOARD_BLACK);
+            cordTipsSprites[8 + i].setFillColor(BOARD_WHITE);
+        }
+        else {
+            
+            cordTipsSprites[7 - i].setFillColor(BOARD_WHITE);
+            cordTipsSprites[8 + i].setFillColor(BOARD_BLACK);
+        }
+        cordTipsSprites[7 - i].setPosition(sf::Vector2f(FONT_POS, tileDim.y * i));
+        
+        cordTipsSprites[8 + i].setPosition(sf::Vector2f(tileDim.x * i + (tileDim.x - FONT_LETTERS_X),
+                                                        tileDim.y * 7 + (tileDim.y - FONT_LETTERS_Y)));
+    }
+}
+
+
+
+
+
+/*
 void windowManager() {
     sf::RenderWindow window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WINDOW_SIZE), "Chess game", sf::Style::Close);
     sf::Sprite piecesSprites[32];
@@ -572,3 +720,5 @@ void findAndIndicateKing(sf::RenderWindow &window, const Chess::Board &mainBoard
         drawATileRed(window, tileDim, kingCoordinates);
     }
 }
+ 
+ */
