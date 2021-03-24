@@ -34,6 +34,6 @@ add_executable(ChessGame
         "src/Pieces/Queen.cpp"
         "src/Pieces/Queen.h"
         "src/Pieces/Rook.cpp"
-        "src/Pieces/Rook.h" src/windowManager.cpp src/windowManager.h)
+        "src/Pieces/Rook.h" src/WindowManager.cpp src/WindowManager.h)
 
 target_link_libraries(ChessGame sfml-graphics sfml-audio sfml-window sfml-system)
