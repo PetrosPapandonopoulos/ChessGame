@@ -1,8 +1,9 @@
 #include "WindowManager.h"
+#include <windows.h>
 
 void windowCycle(WindowManager &);
 
-int main() {
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow ){
     WindowManager windowManager;
     windowCycle(windowManager);
     return 0;
@@ -44,14 +45,19 @@ void windowCycle(WindowManager &windowManager) {
         
         dt = deltaClock.restart();
         
-        if (windowManager.checkForCheckMate(Chess::Color::White) && !windowManager.isSomeoneLost()) {
+        if (windowManager.checkForCheckmate(Chess::Color::White) && !windowManager.isSomeoneLost()) {
             std::cout << "The white pieces won" << std::endl;
             windowManager.setSomeoneLost(true);
             
         }
-        else if (windowManager.checkForCheckMate(Chess::Color::Black) && !windowManager.isSomeoneLost()) {
+        else if (windowManager.checkForCheckmate(Chess::Color::Black) && !windowManager.isSomeoneLost()) {
             std::cout << "The black pieces won" << std::endl;
             windowManager.setSomeoneLost(true);
+        }
+    
+        if (windowManager.checkForDraw() && !windowManager.getIsDraw()){
+            std::cout << "Its a draw" << std::endl;
+            windowManager.setIsDraw(true);
         }
     }
     

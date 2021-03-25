@@ -8,6 +8,7 @@ WindowManager::WindowManager() : window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WIN
     piecesSprites = new sf::Sprite[32];
     cordTipsSprites = new sf::Text[16];
     
+    movesCounter = 0;
     fadeTransparency = 255;
     
     tileDim = {window.getSize().x / (float) BOARD_SIZE, window.getSize().y / (float) BOARD_SIZE};
@@ -156,6 +157,7 @@ void WindowManager::loadCordTips() {
 }
 
 void WindowManager::renderFrame(sf::Time dt) {
+    
     window.clear(sf::Color::Black);
     
     drawTiles(this->window, this->tileDim, {BOARD_SIZE, BOARD_SIZE});
@@ -165,6 +167,10 @@ void WindowManager::renderFrame(sf::Time dt) {
     checkAndDrawFadeEffect(dt);
     
     if (someoneLost) {
+        findAndIndicateKing();
+    }
+    
+    if (isDraw){
         findAndIndicateKing();
     }
     
@@ -193,9 +199,9 @@ void WindowManager::drawTiles(sf::RenderWindow &renderWindow, sf::Vector2f tileD
     }
 }
 
-void WindowManager::drawATileRed(std::pair<int, int> tileCoordinates) {
+void WindowManager::drawATileAColor(std::pair<int, int> tileCoordinates, sf::Color color) {
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
-    square.setFillColor(sf::Color::Red);
+    square.setFillColor(color);
     square.setPosition(sf::Vector2f(tileDim.x * tileCoordinates.second, tileDim.y * tileCoordinates.first));
     window.draw(square);
 }
@@ -400,7 +406,7 @@ sf::Vector2i WindowManager::buttonPressedAction(sf::Vector2i &pieceLastPosition)
     sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
                                       mousePosition.y / ((int) tileDim.y));
     
-    if (!someoneLost) {
+    if (!someoneLost && !isDraw) {
         if (!mainBoard.isEmpty(mousePositionOnBoard.y, mousePositionOnBoard.x)) {
             if (checkTurn(mousePositionOnBoard)) {
                 if (!movingAPiece) {
@@ -449,13 +455,19 @@ sf::Vector2i WindowManager::buttonUnPressedAction(sf::Vector2i &pieceLastPositio
                 int ColBasedOnColor = mainBoard.getWhoseTurn() == Chess::Color::Black ? 0 : 7;
                 setNewPositionStatic({ColBasedOnColor, 5});
             }
+    
+            if (mainBoard.getPieceName(mousePositionOnBoard.y, mousePositionOnBoard.x) == Chess::Type::Pawn){
+                resetMovesCounter();
+            }
+            else{
+                addMoveToCounter();
+            }
             
             Chess::Color result = mainBoard.checkForPromotion();
             
             if (result == Chess::Color::Black || result == Chess::Color::White) {
                 canPromote = true;
             }
-            
             
             mainBoard.nextTurn();
         }
@@ -482,7 +494,7 @@ void WindowManager::promote(sf::Vector2i mousePositionOnBoard) {
     mainBoard.promote({col, row}, ch);
 }
 
-bool WindowManager::checkForCheckMate(Chess::Color color) {
+bool WindowManager::checkForCheckmate(Chess::Color color) {
     std::pair<int, int> kingCoordinates;
     if (mainBoard.checkingForChecks(color, kingCoordinates)) {
         if (mainBoard.checkForCheckmate(color)) {
@@ -497,10 +509,19 @@ void WindowManager::findAndIndicateKing() {
     std::pair<int, int> kingCoordinates;
     
     if (mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates)) {
-        drawATileRed(kingCoordinates);
+        drawATileAColor(kingCoordinates, sf::Color::Red);
+        return;
     }
-    else if (mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
-        drawATileRed(kingCoordinates);
+    else{
+        drawATileAColor(kingCoordinates, sf::Color::Blue);
+    }
+    
+    if (mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
+        drawATileAColor(kingCoordinates, sf::Color::Red);
+        return;
+    }
+    else{
+        drawATileAColor(kingCoordinates, sf::Color::Blue);
     }
 }
 
@@ -539,3 +560,50 @@ bool WindowManager::isSomeoneLost() const {
 void WindowManager::setSomeoneLost(bool input) {
     someoneLost = input;
 }
+
+bool WindowManager::checkForDraw() {
+    
+    if (movesCounter >= MOVES_FOR_DRAW) {
+        return true;
+    }
+    
+    std::pair<int, int> kingCoordinates;
+    
+    if (!mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
+        if (!hasAvailableMoves(Chess::Color::Black)) {
+            return true;
+        }
+    }
+    
+    if (!mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates)) {
+        if (!hasAvailableMoves(Chess::Color::White)) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+void WindowManager::resetMovesCounter() {
+    this->movesCounter = 0;
+}
+
+void WindowManager::addMoveToCounter() {
+    this->movesCounter++;
+}
+
+bool WindowManager::hasAvailableMoves(Chess::Color color) {
+    if (!mainBoard.checkForCheckmate(color)) {
+        return true;
+    }
+    return false;
+}
+
+void WindowManager::setIsDraw(bool input) {
+    this->isDraw = input;
+}
+
+bool WindowManager::getIsDraw() const {
+    return this->isDraw;
+}
+

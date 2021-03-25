@@ -7,6 +7,7 @@
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45
 #define FONT_LETTERS_Y          MAIN_WINDOW_SIZE / 30
 #define SPRITE_SIZE             MAIN_WINDOW_SIZE / 10
+#define MOVES_FOR_DRAW          100
 #define BOARD_BLACK             sf::Color(148, 118, 93)
 #define BOARD_WHITE             sf::Color(238, 238, 213)
 
@@ -19,86 +20,101 @@
 
 
 class WindowManager {
-    private:
-        sf::RenderWindow window;
-        sf::Sprite *piecesSprites;
-        sf::Texture *piecesTextures;
-        sf::Text *cordTipsSprites;
-        sf::Vector2f tileDim;
-        Chess::Board mainBoard;
-        int fadeTransparency = 255;
-        sf::Image icon;
-        sf::Font font;
-        sf::SoundBuffer buffer;
-        sf::Sound moveSound;
-        bool canPromote;
-        bool movingAPiece;
-        bool someoneLost;
+private:
+    sf::RenderWindow window;
+    sf::Sprite *piecesSprites;
+    sf::Texture *piecesTextures;
+    sf::Text *cordTipsSprites;
+    sf::Vector2f tileDim;
+    Chess::Board mainBoard;
+    int fadeTransparency = 255;
+    sf::Image icon;
+    sf::Font font;
+    sf::SoundBuffer buffer;
+    sf::Sound moveSound;
+    unsigned int movesCounter;
+    bool canPromote;
+    bool movingAPiece;
+    bool someoneLost;
+    bool isDraw;
     
-        void loadSprites();
-        
-        void loadCordTips();
-        
-        void drawTiles(sf::RenderWindow& renderWindow, sf::Vector2f tileDimension ,std::pair<int, int> dimOnWindow) const;
-        
-        void drawATileRed(std::pair<int, int> tileCoordinates);
-        
-        void drawCordTips();
-        
-        void drawBoardPieces();
-        
-        void drawFadeEffect(std::pair<int, int> tileCoordinates);
-        
-        void checkAndDrawFadeEffect(sf::Time dt);
-        
-        void placeAPieceBack(sf::Vector2i pieceLastPosition);
+    void loadSprites();
     
-        Chess::Type choiceWindow(Chess::Color color);
+    void loadCordTips();
     
-        bool checkForEitherChecks(std::pair<int, int> &kingCoordinates);
+    void drawTiles(sf::RenderWindow &renderWindow, sf::Vector2f tileDimension, std::pair<int, int> dimOnWindow) const;
     
-        void changeSprite(Chess::Color color, sf::Vector2i spriteIndexCoordinates, Chess::Type ch);
+    void drawATileAColor(std::pair<int, int> tileCoordinates, sf::Color color);
     
-    public:
-        WindowManager();
-        
-        bool windowIsOpen();
-        
-        void closeWindow();
-        
-        bool windowGetPollEvent(sf::Event& event);
-        
-        bool windowHasFocus();
+    void drawCordTips();
     
-        bool isMovingAPiece() const;
+    void resetMovesCounter();
     
-        bool isCanPromote() const;
-        
-        void setCanPromote(bool canPromote);
+    void addMoveToCounter();
     
-        bool isSomeoneLost() const;
-        
-        void setSomeoneLost(bool someoneLost);
-        
-        void renderFrame(sf::Time dt);
+    void drawBoardPieces();
     
-        void setNewPositionStatic(sf::Vector2i newPosition);
+    void drawFadeEffect(std::pair<int, int> tileCoordinates);
     
-        void setNewPosition(sf::Vector2i mousePosition, sf::Vector2i mousePositionOnBoard);
+    void checkAndDrawFadeEffect(sf::Time dt);
     
-        static bool checkBounds(sf::Vector2i mousePositionOnBoard);
+    void findAndIndicateKing();
     
-        bool checkTurn(sf::Vector2i Coordinates);
+    void placeAPieceBack(sf::Vector2i pieceLastPosition);
     
-        void findAndIndicateKing();
+    Chess::Type choiceWindow(Chess::Color color);
     
-        sf::Vector2i buttonPressedAction(sf::Vector2i &pieceLastPosition);
+    bool checkForEitherChecks(std::pair<int, int> &kingCoordinates);
     
-        sf::Vector2i buttonUnPressedAction(sf::Vector2i &pieceLastPosition);
+    void changeSprite(Chess::Color color, sf::Vector2i spriteIndexCoordinates, Chess::Type ch);
     
-        bool checkForCheckMate(Chess::Color color);
-        
-        void promote(sf::Vector2i mousePositionOnBoard);
+    void setNewPositionStatic(sf::Vector2i newPosition);
+    
+    void setNewPosition(sf::Vector2i mousePosition, sf::Vector2i mousePositionOnBoard);
+    
+    bool hasAvailableMoves(Chess::Color color);
+    
+
+public:
+    WindowManager();
+    
+    bool windowIsOpen();
+    
+    void closeWindow();
+    
+    bool windowGetPollEvent(sf::Event &event);
+    
+    bool windowHasFocus();
+    
+    bool isMovingAPiece() const;
+    
+    bool isCanPromote() const;
+    
+    bool getIsDraw() const;
+    
+    void setIsDraw(bool isDraw);
+    
+    void setCanPromote(bool canPromote);
+    
+    bool isSomeoneLost() const;
+    
+    void setSomeoneLost(bool someoneLost);
+    
+    void renderFrame(sf::Time dt);
+    
+    static bool checkBounds(sf::Vector2i mousePositionOnBoard);
+    
+    bool checkTurn(sf::Vector2i Coordinates);
+    
+    sf::Vector2i buttonPressedAction(sf::Vector2i &pieceLastPosition);
+    
+    sf::Vector2i buttonUnPressedAction(sf::Vector2i &pieceLastPosition);
+    
+    bool checkForCheckmate(Chess::Color color);
+    
+    void promote(sf::Vector2i mousePositionOnBoard);
+    
+    bool checkForDraw();
 };
 
 #endif //WINDOWMANAGER_H
