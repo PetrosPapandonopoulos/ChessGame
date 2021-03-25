@@ -226,7 +226,7 @@ void WindowManager::drawFadeEffect(std::pair<int, int> tileCoordinates) {
     
     if (fadeTransparency >= 0) {
         sf::RectangleShape squareRed(sf::Vector2f(tileDim.x, tileDim.y));
-        squareRed.setFillColor(sf::Color(238, 0, 0, fadeTransparency));
+        squareRed.setFillColor(sf::Color(232, 63, 9, fadeTransparency));
         squareRed.setPosition(sf::Vector2f(tileDim.x * tileCoordinates.second, tileDim.y * tileCoordinates.first));
         window.draw(squareRed);
     }
@@ -509,19 +509,20 @@ void WindowManager::findAndIndicateKing() {
     std::pair<int, int> kingCoordinates;
     
     if (mainBoard.checkingForChecks(Chess::Color::White, kingCoordinates)) {
-        drawATileAColor(kingCoordinates, sf::Color::Red);
+        drawATileAColor(kingCoordinates, BOARD_RED);
+        //214, 26, 26
         return;
     }
     else{
-        drawATileAColor(kingCoordinates, sf::Color::Blue);
+        drawATileAColor(kingCoordinates, BOARD_BLUE);
     }
     
     if (mainBoard.checkingForChecks(Chess::Color::Black, kingCoordinates)) {
-        drawATileAColor(kingCoordinates, sf::Color::Red);
+        drawATileAColor(kingCoordinates, BOARD_RED);
         return;
     }
     else{
-        drawATileAColor(kingCoordinates, sf::Color::Blue);
+        drawATileAColor(kingCoordinates, BOARD_BLUE);
     }
 }
 

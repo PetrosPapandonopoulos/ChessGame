@@ -7,9 +7,11 @@
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45
 #define FONT_LETTERS_Y          MAIN_WINDOW_SIZE / 30
 #define SPRITE_SIZE             MAIN_WINDOW_SIZE / 10
-#define MOVES_FOR_DRAW          100
+#define MOVES_FOR_DRAW          6
 #define BOARD_BLACK             sf::Color(148, 118, 93)
 #define BOARD_WHITE             sf::Color(238, 238, 213)
+#define BOARD_BLUE              sf::Color(37, 75, 170)
+#define BOARD_RED               sf::Color(207, 23, 23)
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
