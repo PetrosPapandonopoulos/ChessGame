@@ -36,7 +36,7 @@ void windowCycle(WindowManager &windowManager) {
             }
         }
         
-        windowManager.renderFrame(dt);
+        windowManager.renderFrame(dt, pieceLastPosition);
         
         if (windowManager.isCanPromote()) {
             windowManager.promote(mousePositionOnBoard);
@@ -62,4 +62,3 @@ void windowCycle(WindowManager &windowManager) {
     }
     
 }
-

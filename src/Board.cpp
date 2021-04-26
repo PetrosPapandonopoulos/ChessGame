@@ -389,3 +389,15 @@ bool Board::promote(std::pair<int, int> pieceCoordinates, Type promoteTo) {
 Type Board::getPieceName(int col, int row) const {
     return board[col][row]->getPieceName();
 }
+
+void Board::getAllPossibleMoves(std::pair<int, int> index, std::vector<std::pair<int, int>> &validCoordinates) {
+    this->board[index.first][index.second]->getAllPossibleMoves(validCoordinates, *this);
+    if(this->board[index.first][index.second]->getPieceName() == Type::Pawn){
+        Pawn *pawn = dynamic_cast<Pawn*>(this->board[index.first][index.second].get());
+        pawn->getEnPassant(validCoordinates, *this);
+    }
+    else if(this->board[index.first][index.second]->getPieceName() == Type::King){
+        King *king = dynamic_cast<King*>(this->board[index.first][index.second].get());
+        king->checkCastling(validCoordinates, *this);
+    }
+}

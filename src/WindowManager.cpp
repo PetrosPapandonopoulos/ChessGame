@@ -16,6 +16,7 @@ WindowManager::WindowManager() : window(sf::VideoMode(MAIN_WINDOW_SIZE, MAIN_WIN
     canPromote = false;
     movingAPiece = false;
     someoneLost = false;
+    drawHighlightEffect = false;
     
     buffer.loadFromFile("Resources/PieceAudio.wav");
     moveSound.setBuffer(buffer);
@@ -156,11 +157,15 @@ void WindowManager::loadCordTips() {
     }
 }
 
-void WindowManager::renderFrame(sf::Time dt) {
+void WindowManager::renderFrame(sf::Time dt, sf::Vector2i &pieceLastPosition) {
     
     window.clear(sf::Color::Black);
     
     drawTiles(this->window, this->tileDim, {BOARD_SIZE, BOARD_SIZE});
+    
+    if(drawHighlightEffect){
+        drawHighlights(window, tileDim, pieceLastPosition);
+    }
     
     drawCordTips();
     
@@ -170,7 +175,7 @@ void WindowManager::renderFrame(sf::Time dt) {
         findAndIndicateKing();
     }
     
-    if (isDraw){
+    if (isDraw) {
         findAndIndicateKing();
     }
     
@@ -198,6 +203,49 @@ void WindowManager::drawTiles(sf::RenderWindow &renderWindow, sf::Vector2f tileD
         }
     }
 }
+
+void
+WindowManager::drawHighlights(sf::RenderWindow &renderWindow, sf::Vector2f tileDimension, sf::Vector2i piecePosition) {
+    
+    std::vector<std::pair<int, int>> validCoordinates;
+    float circleRadius = tileDimension.x / 2;
+    float quietRadius = CIRCLE_QUIET_PERCENTAGE * circleRadius;
+    float captureRadius = CIRCLE_ATTACK_PERCENTAGE * circleRadius;
+    
+    sf::CircleShape shape(circleRadius);
+    shape.setOutlineThickness(-tileDimension.x * CIRCLE_OUTLINE_PERCENTAGE);
+    
+    mainBoard.getAllPossibleMoves({piecePosition.y, piecePosition.x}, validCoordinates);
+    
+    for(auto coordinates: validCoordinates) {
+        
+        float currentRadius;
+        
+        if(!mainBoard.isEmpty(coordinates.first, coordinates.second)) {
+            if(mainBoard.getColor(coordinates.first, coordinates.second) != mainBoard.getWhoseTurn()){
+                currentRadius = captureRadius;
+                shape.setFillColor(sf::Color::Transparent);
+                shape.setOutlineColor(sf::Color(CIRCLE_COLOR));
+            }
+        }
+        else {
+            currentRadius = quietRadius;
+            shape.setFillColor(sf::Color(CIRCLE_COLOR));
+            shape.setOutlineColor(sf::Color::Transparent);
+        }
+    
+        float newPosX = tileDimension.x * coordinates.second;
+        float newPosY = tileDimension.y * coordinates.first;
+    
+        newPosX += tileDimension.x / 2 - currentRadius;
+        newPosY += tileDimension.y / 2 - currentRadius;
+        
+        shape.setPosition(newPosX, newPosY);
+        shape.setRadius(currentRadius);
+        renderWindow.draw(shape);
+    }
+}
+
 
 void WindowManager::drawATileAColor(std::pair<int, int> tileCoordinates, sf::Color color) {
     sf::RectangleShape square(sf::Vector2f(tileDim.x, tileDim.y));
@@ -412,6 +460,7 @@ sf::Vector2i WindowManager::buttonPressedAction(sf::Vector2i &pieceLastPosition)
                 if (!movingAPiece) {
                     movingAPiece = true;
                     pieceLastPosition = mousePositionOnBoard;
+                    drawHighlightEffect = true;
                 }
             }
         }
@@ -431,6 +480,7 @@ sf::Vector2i WindowManager::buttonPressedAction(sf::Vector2i &pieceLastPosition)
 sf::Vector2i WindowManager::buttonUnPressedAction(sf::Vector2i &pieceLastPosition) {
     
     movingAPiece = false;
+    drawHighlightEffect = false;
     
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     sf::Vector2i mousePositionOnBoard(mousePosition.x / ((int) tileDim.x),
@@ -455,11 +505,11 @@ sf::Vector2i WindowManager::buttonUnPressedAction(sf::Vector2i &pieceLastPositio
                 int ColBasedOnColor = mainBoard.getWhoseTurn() == Chess::Color::Black ? 0 : 7;
                 setNewPositionStatic({ColBasedOnColor, 5});
             }
-    
-            if (mainBoard.getPieceName(mousePositionOnBoard.y, mousePositionOnBoard.x) == Chess::Type::Pawn){
+            
+            if (mainBoard.getPieceName(mousePositionOnBoard.y, mousePositionOnBoard.x) == Chess::Type::Pawn) {
                 resetMovesCounter();
             }
-            else{
+            else {
                 addMoveToCounter();
             }
             
@@ -513,7 +563,7 @@ void WindowManager::findAndIndicateKing() {
         //214, 26, 26
         return;
     }
-    else{
+    else {
         drawATileAColor(kingCoordinates, BOARD_BLUE);
     }
     
@@ -521,7 +571,7 @@ void WindowManager::findAndIndicateKing() {
         drawATileAColor(kingCoordinates, BOARD_RED);
         return;
     }
-    else{
+    else {
         drawATileAColor(kingCoordinates, BOARD_BLUE);
     }
 }

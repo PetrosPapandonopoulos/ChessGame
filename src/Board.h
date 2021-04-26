@@ -47,6 +47,8 @@ namespace Chess {
         bool checkingForChecks(Color teamColor, std::pair<int, int> &kingCoordinates) const;
     
         bool checkForCheckmate(Color teamColor);
+        
+        void getAllPossibleMoves(std::pair<int, int> index, std::vector<std::pair<int, int>> &validCoordinates);
     };
 }
 

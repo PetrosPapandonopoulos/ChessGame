@@ -7,11 +7,16 @@
 #define FONT_LETTERS_X          MAIN_WINDOW_SIZE / 45
 #define FONT_LETTERS_Y          MAIN_WINDOW_SIZE / 30
 #define SPRITE_SIZE             MAIN_WINDOW_SIZE / 10
-#define MOVES_FOR_DRAW          6
+#define MOVES_FOR_DRAW          50
 #define BOARD_BLACK             sf::Color(148, 118, 93)
 #define BOARD_WHITE             sf::Color(238, 238, 213)
-#define BOARD_BLUE              sf::Color(37, 75, 170)
-#define BOARD_RED               sf::Color(207, 23, 23)
+#define BOARD_BLUE              sf::Color(0, 0, 255)
+#define BOARD_RED               sf::Color(255, 0, 0)
+
+#define CIRCLE_COLOR    sf::Color(0, 0, 0, 50)
+#define CIRCLE_QUIET_PERCENTAGE 0.3
+#define CIRCLE_ATTACK_PERCENTAGE 1.0
+#define CIRCLE_OUTLINE_PERCENTAGE 0.06
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -39,6 +44,7 @@ private:
     bool movingAPiece;
     bool someoneLost;
     bool isDraw;
+    bool drawHighlightEffect;
     
     void loadSprites();
     
@@ -76,6 +82,8 @@ private:
     
     bool hasAvailableMoves(Chess::Color color);
     
+    void drawHighlights(sf::RenderWindow &renderWindow, sf::Vector2f tileDimension, sf::Vector2i piecePosition);
+
 
 public:
     WindowManager();
@@ -102,7 +110,7 @@ public:
     
     void setSomeoneLost(bool someoneLost);
     
-    void renderFrame(sf::Time dt);
+    void renderFrame(sf::Time dt, sf::Vector2i &pieceLastPosition);
     
     static bool checkBounds(sf::Vector2i mousePositionOnBoard);
     
